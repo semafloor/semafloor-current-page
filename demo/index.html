@@ -10,8 +10,9 @@
     <link rel="import" href="../../app-layout/app-header-layout/app-header-layout.html">
     <link rel="import" href="../../app-layout/app-header/app-header.html">
     <link rel="import" href="../../app-layout/app-toolbar/app-toolbar.html">
+    <link rel="import" href="../../paper-dialog/paper-dialog.html">
 
-    <style>
+    <style is="custom-style">
       body {
         margin: 0;
       }
@@ -24,7 +25,7 @@
   <body>
     <app-drawer-layout>
       <!-- nav panel -->
-      <app-header-layout>
+      <app-header-layout drawer>
         <app-header>
           <!-- top toolbar -->
           <app-toolbar></app-toolbar>
@@ -34,23 +35,22 @@
       </app-header-layout>
 
       <!-- main panel -->
-      <app-header-layout>
+      <app-header-layout main>
         <app-header>
           <!-- top toolbar -->
           <app-toolbar>Current Reservations</app-toolbar>
           <!-- bottom toolbar -->
           <app-toolbar></app-toolbar>
-
-          <!-- main content -->
-          <semafloor-current-page></semafloor-current-page>
         </app-header>
+
+        <!-- main content -->
+        <semafloor-current-page></semafloor-current-page>
       </app-header-layout>
     </app-drawer-layout>
 
 
     <script>
       var seedElement = document.querySelector('semafloor-current-page');
-
     </script>
 
   </body>

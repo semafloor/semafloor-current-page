@@ -1,11 +1,23 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="semafloor-current-page-theme.html">
 
+<link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-item/paper-icon-item.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
+
+<link rel="import" href="../app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../app-layout/app-header/app-header.html">
+<link rel="import" href="../app-layout/app-toolbar/app-toolbar.html">
+
+<script src="../lodash/lodash.min.js" charset="utf-8"></script>
 
 <!--
 An element providing a solution to no problem in particular.
@@ -21,54 +33,112 @@ Example:
 -->
 <dom-module id="semafloor-current-page">
 
-  <template>
+  <template strip-whitespace>
     <style include="semafloor-current-page-theme"></style>
 
-    <div class="site-search">
-      <div class="search-icon-column">
-        <iron-icon icon="icons:star-border"></iron-icon>
-      </div>
-      <div class="search-data-column">
-        <div class="search-row">
-          KLB - Tower 5
-        </div>
-      </div>
-    </div>
+    <iron-ajax id="currentAjax"
+      auto
+      url="[[_currentReservationsURL]]"
+      handle-as="json"
+      on-response="_onResponse"
+      last-response="{{_currentReservations}}"></iron-ajax>
 
-    <div class="site-search">
-      <div class="search-icon-column">
-        <iron-icon icon="icons:star-half"></iron-icon>
+    <paper-icon-item class="site-search" name="alpha" on-tap="_toggleCollapsible">
+      <iron-icon icon="icons:star-border" item-icon></iron-icon>
+      <span>KLB - Tower 5</span>
+    </paper-icon-item>
+    <iron-collapse id="alpha">
+      <div class="collapsible-column">
+        <template is="dom-repeat" items="[[_alphaFloors]]" index-as="index">
+          <paper-button raised site="alpha" on-tap="_unveilFloor">
+            <div class="floor-status"></div>
+            <span>[[item]]</span>
+          </paper-button>
+        </template>
       </div>
-      <div class="search-data-column">
-        <div class="search-row">
-          KLB - Tower 2A
-        </div>
-      </div>
-    </div>
+    </iron-collapse>
 
-    <div class="site-search">
-      <div class="search-icon-column">
-        <iron-icon icon="icons:star"></iron-icon>
+    <paper-icon-item class="site-search" name="beta" on-tap="_toggleCollapsible">
+      <iron-icon icon="icons:star-half" item-icon></iron-icon>
+      <span>KLB - Tower 2A</span>
+    </paper-icon-item>
+    <iron-collapse id="beta">
+      <div class="collapsible-column centerify">
+        <paper-button raised site="beta" on-tap="_unveilFloor">
+          <div class="floor-status"></div>
+          <span>Level 3</span>
+        </paper-button>
       </div>
-      <div class="search-data-column">
-        <div class="search-row">
-          SUITE
+    </iron-collapse>
+
+    <paper-icon-item class="site-search" name="gamma" on-tap="_toggleCollapsible">
+      <iron-icon icon="icons:star" item-icon></iron-icon>
+      <span>SUITE</span>
+    </paper-icon-item>
+    <iron-collapse id="gamma">
+      <div class="collapsible-column centerify">
+        <paper-button raised site="gamma" on-tap="_unveilFloor">
+          <div class="floor-status"></div>
+          <span>Level 1</span>
+        </paper-button>
+      </div>
+    </iron-collapse>
+
+    <!-- dialog for each floor -->
+    <paper-dialog id="floorDialog">
+      <app-header-layout has-scrolling-region>
+        <app-header>
+          <app-toolbar class="dialog-top-toolbar">
+            <paper-icon-button icon="icons:close" dialog-dismiss></paper-icon-button>
+            <h2>[[_site]] [[_floor]]</h2>
+          </app-toolbar>
+        </app-header>
+
+        <div class="dialog-main-content">
+          <template is="dom-repeat" items="[[_roomsAtFloor]]" index-as="index">
+            <div class="">
+              <span>[[item.room]]</span>
+              <span>[[item.status]]</span>
+            </div>
+          </template>
         </div>
-      </div>
-    </div>
+
+        <!-- <app-header class="dialog-footer-toolbar">
+          <app-toolbar>
+            <paper-icon-button icon="menu"></paper-icon-button>
+          </app-toolbar>
+        </app-header> -->
+      </app-header-layout>
+    </paper-dialog>
   </template>
 
 </dom-module>
 
 <script>
 
+  var _alphaFloors = ['level 1','level 2','level 3','level 3A','level 5','level 6','level 7','level 8','level 9','level 10','level 11','level 12'];
+  var _alphaFloorsCode = ['01level','02level','03level','04level','05level','06level','07level','08level','09level','10level','11level','12level'];
+  var _betaSites = ['KLB - Tower 5','KLB - Tower 2A','SUITE'];
+
   Polymer({
 
     is: 'semafloor-current-page',
 
     properties: {
-
-
+      _alphaFloors: {
+        type: Array,
+        value: function () {
+          return _alphaFloors;
+        }
+      },
+      _openedCollapsible: String,
+      _floor: String,
+      _site: String,
+      _currentReservations: Object,
+      _currentReservationsURL: String,
+      _floorData: Array,
+      _siteData: String,
+      _roomsAtFloor: Array,
 
     },
 
@@ -90,6 +160,7 @@ Example:
       // This is a good place to perform any work related to your element's
       // visual state or active behavior (measuring sizes, beginning animations,
       // loading resources, etc).
+
     },
 
     detached: function() {
@@ -99,7 +170,70 @@ Example:
       // Use this to clean up anything you did in `attached`.
     },
 
+    _toggleCollapsible: function (ev) {
+      var _target = ev.target;
 
+      while (_target && _target.tagName !== 'PAPER-ICON-ITEM') {
+        _target = _target.parentElement;
+      }
+
+      if (_target && _target.hasAttribute('name')) {
+        var _name = _target.getAttribute('name');
+        var _opened = this._openedCollapsible;
+
+        // allow only 1 opened collapsible at one time.
+        if (_opened && _opened !== _name) {
+          this.$[this._openedCollapsible].hide();
+        }else {
+          // reset when toggling the same collapsible.
+          this.set('_openedCollapsible', '');
+        }
+
+        this.set('_openedCollapsible', _name);
+        this.$[_name].toggle();
+      }
+    },
+
+    _unveilFloor: function (ev) {
+      var _target = ev.target;
+
+      while (_target && _target.tagName !== 'PAPER-BUTTON') {
+        _target = _target.parentElement;
+      }
+
+      if (_target && _target.hasAttribute('site')) {
+        var _site = _target.getAttribute('site');
+        var _siteIdx = _.indexOf(['alpha', 'beta', 'gamma'], _site);
+        var _floor = _.trim(_target.innerText);
+        var _floorIdx = _.indexOf(_alphaFloors, String.prototype.toLowerCase.call(_floor));
+
+        // setting dialog title.
+        this.set('_floor', _floor);
+        this.set('_site', _betaSites[_siteIdx]);
+        // tell which floor data is needed.
+        this.set('_floorData', _alphaFloorsCode[_floorIdx]);
+        this.set('_siteData', _site);
+        // make ajax call.
+        this.set('_currentReservationsURL', '../current-reservations.json');
+        // close opened collapsible first to get rid of the scroller.
+        this.$[this._openedCollapsible].hide();
+        // open dialog.
+        this.$.floorDialog.open();
+        // set url null so that everytime makes ajax call to get latest data.
+        this.async(function() {
+          this.set('_currentReservationsURL', null);
+        }, 1);
+      }
+    },
+
+    _onResponse: function (ev) {
+      // when response and floor is received...
+      if (this._currentReservations && this._siteData && this._floorData) {
+        this.set('_roomsAtFloor', this._currentReservations[this._siteData][this._floorData])
+        // // fire event when everything is ready to rock 'n' roll.
+        // this.fire('current-ready');
+      }
+    },
 
   });
 
