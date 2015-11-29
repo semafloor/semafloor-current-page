@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>semafloor-current-page Demo</title>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../semafloor-current-page.html">
+    <link rel="import" href="../../app-layout/app-drawer-layout/app-drawer-layout.html">
+    <link rel="import" href="../../app-layout/app-header-layout/app-header-layout.html">
+    <link rel="import" href="../../app-layout/app-header/app-header.html">
+    <link rel="import" href="../../app-layout/app-toolbar/app-toolbar.html">
+
+    <style>
+      body {
+        margin: 0;
+      }
+
+      app-toolbar {
+        background-color: #607d8b;
+      }
+    </style>
+  </head>
+  <body>
+    <app-drawer-layout>
+      <!-- nav panel -->
+      <app-header-layout>
+        <app-header>
+          <!-- top toolbar -->
+          <app-toolbar></app-toolbar>
+          <!-- bottom toolbar -->
+          <app-toolbar></app-toolbar>
+        </app-header>
+      </app-header-layout>
+
+      <!-- main panel -->
+      <app-header-layout>
+        <app-header>
+          <!-- top toolbar -->
+          <app-toolbar>Current Reservations</app-toolbar>
+          <!-- bottom toolbar -->
+          <app-toolbar></app-toolbar>
+
+          <!-- main content -->
+          <semafloor-current-page></semafloor-current-page>
+        </app-header>
+      </app-header-layout>
+    </app-drawer-layout>
+
+
+    <script>
+      var seedElement = document.querySelector('semafloor-current-page');
+
+    </script>
+
+  </body>
+</html>
