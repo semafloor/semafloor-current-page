@@ -86,20 +86,27 @@ Example:
 
     <!-- dialog for each floor -->
     <paper-dialog id="floorDialog">
-      <app-header-layout has-scrolling-region>
+      <app-header-layout>
         <app-header>
           <app-toolbar class="dialog-top-toolbar">
             <paper-icon-button icon="icons:close" dialog-dismiss></paper-icon-button>
+          </app-toolbar>
+          <app-toolbar class="dialog-bottom-toolbar">
             <h2>[[_site]] [[_floor]]</h2>
           </app-toolbar>
         </app-header>
 
         <div class="dialog-main-content">
           <template is="dom-repeat" items="[[_roomsAtFloor]]" index-as="index">
-            <div class="">
-              <span>[[item.room]]</span>
+            <paper-icon-item room$="[[_computeRoomname(item.name)]]" on-tap="_toggleRoomCollapsible">
+              <iron-icon icon="icons:radio-button-[[_isVacantChecked(item.status)]]" item-icon class$="[[_isVacant(item.status)]]"></iron-icon>
+              <div class="">
+                <span>[[item.name]]</span>
+              </div>
+            </paper-icon-item>
+            <iron-collapse id$="[[_computeRoomname(item.name)]]">
               <span>[[item.status]]</span>
-            </div>
+            </iron-collapse>
           </template>
         </div>
 
@@ -116,7 +123,7 @@ Example:
 
 <script>
 
-  var _alphaFloors = ['level 1','level 2','level 3','level 3A','level 5','level 6','level 7','level 8','level 9','level 10','level 11','level 12'];
+  var _alphaFloors = ['level 1','level 2','level 3','level 3a','level 5','level 6','level 7','level 8','level 9','level 10','level 11','level 12'];
   var _alphaFloorsCode = ['01level','02level','03level','04level','05level','06level','07level','08level','09level','10level','11level','12level'];
   var _betaSites = ['KLB - Tower 5','KLB - Tower 2A','SUITE'];
 
@@ -233,6 +240,55 @@ Example:
         // // fire event when everything is ready to rock 'n' roll.
         // this.fire('current-ready');
       }
+    },
+
+    _isVacant: function (_status) {
+      switch (_status) {
+        case 'Vacant':
+          return 'room-is-vacant';
+          break;
+        case 'Occupied':
+          return 'room-is-occupied';
+          break;
+        case 'Reserved':
+          return 'room-is-reserved';
+          break;
+        default:
+          console.log('Error! ' + _status + ' not found.');
+      }
+    },
+    _isVacantChecked: function (_status) {
+      switch (_status) {
+        case 'Vacant':
+          return 'unchecked';
+          break;
+        case 'Occupied':
+        case 'Reserved':
+          return 'checked';
+          break;
+        default:
+          console.log('Error! ' + _status + ' not found.');
+      }
+    },
+
+    _toggleRoomCollapsible: function (ev) {
+      var _target = ev.target;
+
+      while (_target && _target.tagName !== 'PAPER-ICON-ITEM') {
+        _target = _target.parentElement;
+      }
+
+      if (_target && _target.hasAttribute('room')) {
+        var _room = _target.getAttribute('room');
+
+        console.log(_room);
+        console.log(this.$$('#' + _room));
+        this.$$('#' + _room).toggle();
+      }
+    },
+
+    _computeRoomname: function (_name) {
+      return _.camelCase(_name);
     },
 
   });

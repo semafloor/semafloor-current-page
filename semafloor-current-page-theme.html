@@ -15,6 +15,7 @@
 
         display: block;
         height: 100%;
+        @apply(--paper-font-common-base);
       }
 
       *, *::before, *::after {
@@ -91,15 +92,24 @@
         bottom: 0;
         left: 0;
         right: 0;
-        /*overflow: auto;*/
+        overflow: auto;
       }
 
       .dialog-top-toolbar {
         background-color: #607D8B;
       }
+      .dialog-bottom-toolbar {
+        background-color: #607D8B;
+      }
 
-      .dialog-footer-toolbar {
-
+      iron-icon.room-is-vacant {
+        color: #00e676;
+      }
+      iron-icon.room-is-occupied {
+        color: #ff1744;
+      }
+      iron-icon.room-is-reserved {
+        color: #ff9100;
       }
 
 
