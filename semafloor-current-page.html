@@ -257,10 +257,8 @@ Example:
     },
 
     _onResponse: function (ev) {
-      console.log('on-response');
       // when response and floor is received...
       if (this._currentReservations && this._siteData && this._floorData) {
-        console.log('on-reponse-running');
         this.set('_roomsAtFloor', this._currentReservations[this._siteData][this._floorData])
         // set unused properties null, will skip this execution when not unveiling floor.
         this.set('_siteData', null);
@@ -345,7 +343,6 @@ Example:
     },
 
     _computeFloorStatus: function (_json) {
-      console.log('compute-floor-status');
       var _alphaStat = [];
       var _betaStat, _gammaStat;
       // when the first el is of value 'Vacant', it stops iterating.
