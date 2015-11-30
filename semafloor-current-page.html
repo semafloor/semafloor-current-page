@@ -65,7 +65,7 @@ Example:
     <iron-collapse id="beta">
       <div class="collapsible-column centerify">
         <paper-button raised site="beta" on-tap="_unveilFloor">
-          <div class="floor-status"></div>
+          <div class$="floor-status[[_computeBetaStatus(_betaStatus)]]"></div>
           <span>Level 3</span>
         </paper-button>
       </div>
@@ -78,7 +78,7 @@ Example:
     <iron-collapse id="gamma">
       <div class="collapsible-column centerify">
         <paper-button raised site="gamma" on-tap="_unveilFloor">
-          <div class="floor-status"></div>
+          <div class$="floor-status[[_computeGammaStatus(_gammaStatus)]]"></div>
           <span>Level 1</span>
         </paper-button>
       </div>
@@ -223,6 +223,8 @@ Example:
         var _floorIdx = _.indexOf(_alphaFloors, String.prototype.toLowerCase.call(_floor));
         // set url null, so that to read latest data.
         this.set('_currentReservationsURL', null);
+        // reset dialog content first.
+        this.set('_roomsAtFloor', null);
 
         // setting dialog title.
         this.set('_floor', _floor);
@@ -238,21 +240,16 @@ Example:
         this.$.floorDialog.open();
         // set unused var null.
         _target = null; _site = null; _siteIdx = null; _floor = null; _floorIdx = null;
-        // set url null so that everytime makes ajax call to get latest data.
-        this.async(function() {
-          this.set('_currentReservationsURL', null);
-        }, 1);
       }
     },
 
     _onResponse: function (ev) {
-      console.log('haha');
       // when response and floor is received...
       if (this._currentReservations && this._siteData && this._floorData) {
-      console.log('lol');
         this.set('_roomsAtFloor', this._currentReservations[this._siteData][this._floorData])
-        // // fire event when everything is ready to rock 'n' roll.
-        // this.fire('current-ready');
+        // set unused properties null, will skip this execution when not unveiling floor.
+        this.set('_siteData', null);
+        this.set('_floorData', null);
       }
     },
 
@@ -329,28 +326,54 @@ Example:
     },
 
     _computeFloorStatus: function (_json) {
-      console.log(_json);
       var _alphaStat = [];
       var _betaStat, _gammaStat;
+      // when the first el is of value 'Vacant', it stops iterating.
       for (var i = 0; i < _alphaFloors.length; i++) {
-        var _stat = _json.alpha[_alphaFloorsCode[i]].every(function (el, idx, arr) {
-          return el.status !== 'Vacant';
+        var _stat = _json.alpha[_alphaFloorsCode[i]].some(function (el) {
+          return el.status === 'Vacant';
         });
         _alphaStat.push(_stat);
+        _stat = null; // set null.
       }
-      this.set('_alphaStatus', _alphaStat);
-      this.set('_alphaFloors', _alphaFloors);
+      _betaStat = _json.beta['03level'].some(function (el) {
+        return el.status === 'Vacant';
+      });
+      _gammaStat = _json.gamma['01level'].some(function (el) {
+        return el.status === 'Vacant';
+      });
 
-      // _json.beta[0]
+      // set the array with all the status of all floors.
+      this.set('_alphaStatus', _alphaStat);
+      this.set('_betaStatus', _betaStat);
+      this.set('_gammaStatus', _gammaStat);
+      // then, set the _alphaFloors to dynamically generate floors' elements.
+      this.set('_alphaFloors', _alphaFloors);
+      // set unused var null.
+      _alphaStat = null; _betaStat = null; _gammaStat = null;
     },
 
     _computeAlphaStatus: function (_idx) {
       if (!_.isUndefined(_idx) && !_.isUndefined(this._alphaStatus)) {
         if (this._alphaStatus[_idx]) {
-          return ' no-vacant-room';
-        }else {
           return ' vacant-room';
+        }else {
+          return ' no-vacant-room';
         }
+      }
+    },
+    _computeBetaStatus: function (_betaStatus) {
+      if (_betaStatus) {
+        return ' vacant-room';
+      }else {
+        return ' no-vacant-room';
+      }
+    },
+    _computeGammaStatus: function (_gammaStatus) {
+      if (_gammaStatus) {
+        return ' vacant-room';
+      }else {
+        return ' no-vacant-room';
       }
     },
 
