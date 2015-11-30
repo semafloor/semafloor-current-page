@@ -20,7 +20,7 @@
       "time": ""
     }, {
       "id": "alpha01level002",
-      "locked": false,
+      "locked": true,
       "name" : "The Shard",
       "person": "",
       "room" : "the%20shard",
