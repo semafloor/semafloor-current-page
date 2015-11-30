@@ -51,7 +51,7 @@ Example:
       <div class="collapsible-column">
         <template is="dom-repeat" items="[[_alphaFloors]]" index-as="index">
           <paper-button raised site="alpha" on-tap="_unveilFloor">
-            <div class="floor-status"></div>
+            <div class$="floor-status[[_computeAlphaStatus(index)]]"></div>
             <span>[[item]]</span>
           </paper-button>
         </template>
@@ -89,7 +89,7 @@ Example:
       <app-header-layout>
         <app-header>
           <app-toolbar class="dialog-top-toolbar">
-            <paper-icon-button icon="icons:close" dialog-dismiss></paper-icon-button>
+            <paper-icon-button icon="icons:close" dialog-dismiss on-tap="_closeDialog"></paper-icon-button>
           </app-toolbar>
           <app-toolbar class="dialog-bottom-toolbar">
             <h2>[[_site]] [[_floor]]</h2>
@@ -132,22 +132,25 @@ Example:
     is: 'semafloor-current-page',
 
     properties: {
-      _alphaFloors: {
-        type: Array,
-        value: function () {
-          return _alphaFloors;
-        }
-      },
+      _alphaFloors: Array,
       _openedCollapsible: String,
       _floor: String,
       _site: String,
-      _currentReservations: Object,
       _currentReservationsURL: String,
+      _currentReservations: Object,
       _floorData: Array,
       _siteData: String,
       _roomsAtFloor: Array,
+      _openedRoomCollapsible: String,
+      _alphaStatus: Array,
+      _betaStatus: Boolean,
+      _gammaStatus: Boolean,
 
     },
+
+    observers: [
+      '_computeFloorStatus(_currentReservations)'
+    ],
 
     // Element Lifecycle
 
@@ -168,6 +171,8 @@ Example:
       // visual state or active behavior (measuring sizes, beginning animations,
       // loading resources, etc).
 
+      // make ajax call.
+      this.set('_currentReservationsURL', '../current-reservations.json');
     },
 
     detached: function() {
@@ -190,14 +195,17 @@ Example:
 
         // allow only 1 opened collapsible at one time.
         if (_opened && _opened !== _name) {
-          this.$[this._openedCollapsible].hide();
+          this.$[_opened].hide();
         }else {
           // reset when toggling the same collapsible.
           this.set('_openedCollapsible', '');
         }
-
+        // set current as previous for the next toggle.
         this.set('_openedCollapsible', _name);
+        // toggle collapsible.
         this.$[_name].toggle();
+        // set unused var null.
+        _target = null; _name = null; _opened = null;
       }
     },
 
@@ -213,6 +221,8 @@ Example:
         var _siteIdx = _.indexOf(['alpha', 'beta', 'gamma'], _site);
         var _floor = _.trim(_target.innerText);
         var _floorIdx = _.indexOf(_alphaFloors, String.prototype.toLowerCase.call(_floor));
+        // set url null, so that to read latest data.
+        this.set('_currentReservationsURL', null);
 
         // setting dialog title.
         this.set('_floor', _floor);
@@ -226,6 +236,8 @@ Example:
         this.$[this._openedCollapsible].hide();
         // open dialog.
         this.$.floorDialog.open();
+        // set unused var null.
+        _target = null; _site = null; _siteIdx = null; _floor = null; _floorIdx = null;
         // set url null so that everytime makes ajax call to get latest data.
         this.async(function() {
           this.set('_currentReservationsURL', null);
@@ -234,8 +246,10 @@ Example:
     },
 
     _onResponse: function (ev) {
+      console.log('haha');
       // when response and floor is received...
       if (this._currentReservations && this._siteData && this._floorData) {
+      console.log('lol');
         this.set('_roomsAtFloor', this._currentReservations[this._siteData][this._floorData])
         // // fire event when everything is ready to rock 'n' roll.
         // this.fire('current-ready');
@@ -280,15 +294,64 @@ Example:
 
       if (_target && _target.hasAttribute('room')) {
         var _room = _target.getAttribute('room');
+        var _opened = this._openedRoomCollapsible;
 
-        console.log(_room);
-        console.log(this.$$('#' + _room));
+        // allow only 1 opened collapsible at one time.
+        if (_opened && _opened !== _room) {
+          this.$$('#' + _opened).hide();
+        }else {
+          // reset when toggling the same collapsible.
+          this.set('_openedRoomCollapsible', '');
+        }
+        // save current one as previous for the next toggle.
+        this.set('_openedRoomCollapsible', _room);
+        // toggle collapsible.
         this.$$('#' + _room).toggle();
+        // set unused var null.
+        _target = null; _room = null; _opened = null;
       }
     },
 
     _computeRoomname: function (_name) {
       return _.camelCase(_name);
+    },
+
+    _closeDialog: function (ev) {
+      // PART 1: set url null...
+      this.set('_currentReservationsURL', null);
+      // hide all opened collapsible and set null when closing dialog.
+      if (this._openedRoomCollapsible) {
+        this.$$('#' + this._openedRoomCollapsible).hide();
+        this.set('_openedRoomCollapsible', '');
+      }
+      // PART 2: ...so that to read latest data.
+      this.set('_currentReservationsURL', '../current-reservations.json');
+    },
+
+    _computeFloorStatus: function (_json) {
+      console.log(_json);
+      var _alphaStat = [];
+      var _betaStat, _gammaStat;
+      for (var i = 0; i < _alphaFloors.length; i++) {
+        var _stat = _json.alpha[_alphaFloorsCode[i]].every(function (el, idx, arr) {
+          return el.status !== 'Vacant';
+        });
+        _alphaStat.push(_stat);
+      }
+      this.set('_alphaStatus', _alphaStat);
+      this.set('_alphaFloors', _alphaFloors);
+
+      // _json.beta[0]
+    },
+
+    _computeAlphaStatus: function (_idx) {
+      if (!_.isUndefined(_idx) && !_.isUndefined(this._alphaStatus)) {
+        if (this._alphaStatus[_idx]) {
+          return ' no-vacant-room';
+        }else {
+          return ' vacant-room';
+        }
+      }
     },
 
   });
