@@ -185,7 +185,7 @@ Example:
       // loading resources, etc).
 
       // make ajax call.
-      this.set('_currentReservationsURL', '../current-reservations.json');
+      this.set('_currentReservationsURL', '../json/current-reservations.json');
     },
 
     detached: function() {
@@ -246,7 +246,7 @@ Example:
         this.set('_floorData', _alphaFloorsCode[_floorIdx]);
         this.set('_siteData', _site);
         // make ajax call.
-        this.set('_currentReservationsURL', '../current-reservations.json');
+        this.set('_currentReservationsURL', '../json/current-reservations.json');
         // close opened collapsible first to get rid of the scroller.
         this.$[this._openedCollapsible].hide();
         // open dialog.
@@ -338,7 +338,7 @@ Example:
         this.set('_openedRoomCollapsible', '');
       }
       // PART 2: ...so that to read latest data.
-      this.set('_currentReservationsURL', '../current-reservations.json');
+      this.set('_currentReservationsURL', '../json/current-reservations.json');
       // this.set('_alphaFloors', _alphaFloors);
     },
 
