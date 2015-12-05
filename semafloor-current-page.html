@@ -43,11 +43,11 @@ Example:
       on-response="_onResponse"
       last-response="{{_currentReservations}}"></iron-ajax>
 
-    <paper-icon-item class="site-search" name="alpha" on-tap="_toggleCollapsible">
+    <paper-icon-item class="site-search" name="alphaSite" on-tap="_toggleCollapsible">
       <iron-icon icon="icons:star-border" item-icon></iron-icon>
       <span>KLB - Tower 5</span>
     </paper-icon-item>
-    <iron-collapse id="alpha">
+    <iron-collapse id="alphaSite">
       <div class="collapsible-column">
         <template is="dom-repeat" items="[[_alphaFloors]]" index-as="index">
           <paper-button raised site="alpha" on-tap="_unveilFloor">
@@ -58,11 +58,11 @@ Example:
       </div>
     </iron-collapse>
 
-    <paper-icon-item class="site-search" name="beta" on-tap="_toggleCollapsible">
+    <paper-icon-item class="site-search" name="betaSite" on-tap="_toggleCollapsible">
       <iron-icon icon="icons:star-half" item-icon></iron-icon>
       <span>KLB - Tower 2A</span>
     </paper-icon-item>
-    <iron-collapse id="beta">
+    <iron-collapse id="betaSite">
       <div class="collapsible-column centerify">
         <paper-button raised site="beta" on-tap="_unveilFloor">
           <div class$="floor-status[[_computeBetaStatus(_betaStatus)]]"></div>
@@ -71,11 +71,11 @@ Example:
       </div>
     </iron-collapse>
 
-    <paper-icon-item class="site-search" name="gamma" on-tap="_toggleCollapsible">
+    <paper-icon-item class="site-search" name="gammaSite" on-tap="_toggleCollapsible">
       <iron-icon icon="icons:star" item-icon></iron-icon>
       <span>SUITE</span>
     </paper-icon-item>
-    <iron-collapse id="gamma">
+    <iron-collapse id="gammaSite">
       <div class="collapsible-column centerify">
         <paper-button raised site="gamma" on-tap="_unveilFloor">
           <div class$="floor-status[[_computeGammaStatus(_gammaStatus)]]"></div>
