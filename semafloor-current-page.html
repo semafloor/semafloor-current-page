@@ -1,21 +1,15 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="semafloor-current-page-theme.html">
+<link rel="import" href="semafloor-current-page-icons.html">
 
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
-<link rel="import" href="../iron-icon/iron-icon.html">
-<link rel="import" href="../iron-icons/iron-icons.html">
 
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-item/paper-icon-item.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
-
-<link rel="import" href="../app-layout/app-drawer-layout/app-drawer-layout.html">
-<link rel="import" href="../app-layout/app-header-layout/app-header-layout.html">
-<link rel="import" href="../app-layout/app-header/app-header.html">
-<link rel="import" href="../app-layout/app-toolbar/app-toolbar.html">
 
 <script src="../lodash/lodash.min.js" charset="utf-8"></script>
 
@@ -44,12 +38,12 @@ Example:
       last-response="{{_currentReservations}}"></iron-ajax>
 
     <paper-icon-item class="site-search" name="alphaSite" on-tap="_toggleCollapsible">
-      <iron-icon icon="icons:star-border" item-icon></iron-icon>
+      <iron-icon icon="icons:language" item-icon></iron-icon>
       <span>KLB - Tower 5</span>
     </paper-icon-item>
     <iron-collapse id="alphaSite">
       <div class="collapsible-column">
-        <template is="dom-repeat" items="[[_alphaFloors]]" index-as="index">
+        <template is="dom-repeat" items="[[_alphaFloors]]" index-as="index" strip-whitespace>
           <paper-button raised site="alpha" on-tap="_unveilFloor">
             <div class$="floor-status[[_computeAlphaStatus(index, item)]]"></div>
             <span>[[item]]</span>
@@ -59,11 +53,11 @@ Example:
     </iron-collapse>
 
     <paper-icon-item class="site-search" name="betaSite" on-tap="_toggleCollapsible">
-      <iron-icon icon="icons:star-half" item-icon></iron-icon>
+      <iron-icon icon="icons:trending-up" item-icon></iron-icon>
       <span>KLB - Tower 2A</span>
     </paper-icon-item>
     <iron-collapse id="betaSite">
-      <div class="collapsible-column centerify">
+      <div class="collapsible-column">
         <paper-button raised site="beta" on-tap="_unveilFloor">
           <div class$="floor-status[[_computeBetaStatus(_betaStatus)]]"></div>
           <span>Level 3</span>
@@ -72,11 +66,11 @@ Example:
     </iron-collapse>
 
     <paper-icon-item class="site-search" name="gammaSite" on-tap="_toggleCollapsible">
-      <iron-icon icon="icons:star" item-icon></iron-icon>
+      <iron-icon icon="icons:group-work" item-icon></iron-icon>
       <span>SUITE</span>
     </paper-icon-item>
     <iron-collapse id="gammaSite">
-      <div class="collapsible-column centerify">
+      <div class="collapsible-column">
         <paper-button raised site="gamma" on-tap="_unveilFloor">
           <div class$="floor-status[[_computeGammaStatus(_gammaStatus)]]"></div>
           <span>Level 1</span>
@@ -85,51 +79,48 @@ Example:
     </iron-collapse>
 
     <!-- dialog for each floor -->
+    // TODO: Finish floorDialog.
     <paper-dialog id="floorDialog">
-      <app-header-layout>
-        <app-header>
-          <app-toolbar>
-            <paper-icon-button icon="icons:close" dialog-dismiss on-tap="_closeDialog"></paper-icon-button>
-          </app-toolbar>
-          <app-toolbar>
-            <h2>[[_site]] [[_floor]]</h2>
-          </app-toolbar>
-        </app-header>
-
-        <div class="dialog-main-content">
-          <template is="dom-repeat" items="[[_roomsAtFloor]]" index-as="index">
-            <paper-icon-item room$="[[_computeRoomname(item.name)]]" on-tap="_toggleRoomCollapsible">
-              <iron-icon icon="icons:radio-button-[[_isVacantChecked(item.status)]]" item-icon class$="[[_isVacant(item.status)]]"></iron-icon>
-              <div class$="room-collapsible[[_isLocked(item.locked)]]">
-                <iron-icon icon="icons:lock[[_computeLocked(item.locked)]]"></iron-icon>
-                <span class="room-collapsible-name">[[item.name]]</span>
-                <span class="room-collapsible-time">[[item.time]]</span>
-              </div>
-            </paper-icon-item>
-            <iron-collapse id$="[[_computeRoomname(item.name)]]" class="room-collapsible-container">
-              <div class="room-collapsible-item">
-                <span class="room-collapsible-item-label">Person</span>
-                <span class="room-collapsible-item-data">[[item.person]]</span>
-              </div>
-              <div class="room-collapsible-item">
-                <span class="room-collapsible-item-label">Subject</span>
-                <span class="room-collapsible-item-data">[[item.subject]]</span>
-              </div>
-              <div class="room-collapsible-item">
-                <span class="room-collapsible-item-label">Time</span>
-                <span class="room-collapsible-item-data">[[item.time]]</span>
-              </div>
-            </iron-collapse>
-          </template>
-        </div>
-
-        <!-- <app-header class="dialog-footer-toolbar">
-          <app-toolbar>
-            <paper-icon-button icon="menu"></paper-icon-button>
-          </app-toolbar>
-        </app-header> -->
-      </app-header-layout>
+      <h2>Header</h2>
+      <paper-dialog-scrollable>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Expedita quo quis ipsam pariatur voluptatum vitae, veniam voluptatibus, magni maxime laudantium consequatur est vero inventore. Obcaecati tempora asperiores magni, eius culpa ullam illum maiores deleniti, beatae mollitia aliquam blanditiis quod odit facilis dolorum? Explicabo pariatur quas deleniti doloribus velit quisquam. Laboriosam inventore facilis, rerum laudantium est molestias ut architecto placeat? Nisi dolorum veniam sunt, aspernatur cumque voluptas placeat debitis, dolor blanditiis quae quibusdam, incidunt nesciunt molestias cum recusandae voluptatibus, qui asperiores eligendi tempora numquam. Maiores repellat quos facilis error quibusdam fuga, consectetur omnis quisquam. Eveniet ipsa, porro ipsam sit accusamus in saepe minima id officiis, recusandae dolorem est aliquid nihil rerum voluptatibus doloremque quod. Reiciendis esse culpa consequuntur temporibus adipisci recusandae optio veniam deserunt praesentium itaque corrupti illo voluptate neque expedita quis, veritatis voluptates obcaecati consectetur doloribus est dolorum, consequatur. Facilis quia molestiae, impedit eaque amet corporis minus laudantium, enim ipsam natus eius necessitatibus quam quidem nemo ad nostrum at optio explicabo voluptatum magni, veritatis voluptate numquam? Error ducimus debitis aliquam. Suscipit sit odio assumenda eligendi, temporibus cum, recusandae voluptatum repellat illo in rem at repudiandae explicabo, asperiores quis ex aspernatur numquam iusto sunt magni! In, natus aperiam ipsa laudantium veniam.
+      </paper-dialog-scrollable>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm>Accept</paper-button>
+      </div>
     </paper-dialog>
+    <!-- <div class="no-padding">
+      <div class="fake-toolbar">
+        <paper-icon-button icon="icons:close" dialog-dismiss on-tap="_closeDialog"></paper-icon-button>
+        [[_site]] [[_floor]]
+      </div>
+
+    <div class="dialog-main-content">
+      <template is="dom-repeat" items="[[_roomsAtFloor]]" index-as="index" strip-whitespace>
+        <paper-icon-item class$="each-room[[_isLocked(item.locked)]]" room$="[[_computeRoomname(item.name)]]" on-tap="_toggleRoomCollapsible">
+          <iron-icon icon="icons:radio-button-[[_isVacantChecked(item.status)]]" item-icon class$="[[_isVacant(item.status)]]"></iron-icon>
+          <iron-icon class="room-lock" icon="icons:lock[[_computeLocked(item.locked)]]"></iron-icon>
+          [[item.name]]
+          <div class="room-collapsible-time">[[item.time]]</div>
+        </paper-icon-item>
+        <iron-collapse id$="[[_computeRoomname(item.name)]]" class="room-collapsible-container">
+          <div class="room-collapsible-item">
+            Person
+            <span class="room-collapsible-item-data">[[item.person]]</span>
+          </div>
+          <div class="room-collapsible-item">
+            Subject
+            <span class="room-collapsible-item-data">[[item.subject]]</span>
+          </div>
+          <div class="room-collapsible-item">
+            Time
+            <div class="room-collapsible-item-data">[[item.time]]</div>
+          </div>
+        </iron-collapse>
+      </template>
+    </div>
+  </div> -->
   </template>
 
 </dom-module>
