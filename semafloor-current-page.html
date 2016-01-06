@@ -2,13 +2,13 @@
 <link rel="import" href="semafloor-current-page-theme.html">
 <link rel="import" href="semafloor-current-page-icons.html">
 
+<link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../iron-selector/iron-selector.html">
+<link rel="import" href="../iron-list/iron-list.html">
 
 <!--
-<link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
-<link rel="import" href="../iron-list/iron-list.html">
 
 <link rel="import" href="../paper-item/paper-icon-item.html">
 <link rel="import" href="../paper-tabs/paper-tabs.html">
@@ -41,12 +41,12 @@ Example:
   <template strip-whitespace>
     <style include="semafloor-current-page-theme"></style>
 
-    <!-- <iron-ajax id="currentAjax"
+    <iron-ajax id="currentAjax"
       auto
-      url="[[_currentReservationsURL]]"
+      url="[[_url]]"
       handle-as="json"
       on-response="_onResponse"
-      last-response="{{_currentReservations}}"></iron-ajax> -->
+      last-response="{{_currentReservations}}"></iron-ajax>
 
     <iron-selector selected="{{selectedSite}}" attr-for-selected="site">
       <div class="site-selectable" site="KLB - Tower 5">
@@ -59,10 +59,21 @@ Example:
         <iron-icon icon="icons:group-work"></iron-icon>SUITE
       </div>
     </iron-selector>
-    <iron-pages selected="[[selectedSite]]" attr-for-selected="site">
-      <div site="KLB - Tower 5">One</div>
-      <div site="KLB - Tower 2A">Two</div>
-      <div site="SUITE">Three</div>
+
+    <iron-pages selected="[[_selectedPage]]" attr-for-selected="page">
+      <div page="floor">
+        <iron-list items="[[_floorsAtSelectedSite]]" index-as="index">
+          <template strip-whitespace>
+            <div class="each-floor">
+              <div class$="each-floor-status[[_isVacantFloor(_currentReservations, selectedSite, index)]]"></div>
+              [[item]]
+            </div>
+          </template>
+        </iron-list>
+      </div>
+      <div page="room">
+        Lorem ipsum dolor sit amet.
+      </div>
     </iron-pages>
 
   </template>
@@ -71,9 +82,10 @@ Example:
 
 <script>
 
-  var _alphaFloors = ['level 1','level 2','level 3','level 3a','level 5','level 6','level 7','level 8','level 9','level 10','level 11','level 12'];
+  var _alphaFloors = ['level 1','level 2','level 3','level 3A','level 5','level 6','level 7','level 8','level 9','level 10','level 11','level 12'];
   var _alphaFloorsCode = ['01level','02level','03level','04level','05level','06level','07level','08level','09level','10level','11level','12level'];
-  var _betaSites = ['KLB - Tower 5','KLB - Tower 2A','SUITE'];
+  var _siteNames = ['KLB - Tower 5','KLB - Tower 2A','SUITE'];
+  var _statusCodes = ['_alphaStatus', '_betaStatus', '_gammaStatus'];
 
   Polymer({
 
@@ -84,10 +96,53 @@ Example:
         type: String,
         value: 'KLB - Tower 5'
       },
+
+      _selectedPage: {
+        type: String,
+        value: 'floor'
+      },
+      _floorsAtSelectedSite: {
+        type: Array,
+        value: function() {
+            return _alphaFloors;
+        },
+        computed: '_computeFloorsAtSelection(selectedSite)'
+      },
+      _currentReservations: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      },
+      _url: {
+        type: String,
+        value: '../json/current-reservations.json'
+      },
+      _alphaStatus: {
+        type: Array,
+        value: function() {
+          return [];
+        },
+        computed: '_computeFloorStatus(_currentReservations.alpha)'
+      },
+      _betaStatus: {
+        type: Array,
+        value: function() {
+          return [];
+        },
+        computed: '_computeFloorStatus(_currentReservations.beta, "beta")'
+      },
+      _gammaStatus: {
+        type: Array,
+        value: function() {
+          return [];
+        },
+        computed: '_computeFloorStatus(_currentReservations.gamma, "gamma")'
+      },
+
     },
 
     observers: [
-
     ],
 
     // Element Lifecycle
@@ -109,8 +164,7 @@ Example:
       // visual state or active behavior (measuring sizes, beginning animations,
       // loading resources, etc).
 
-      // make ajax call.
-      this.set('_currentReservationsURL', '../json/current-reservations.json');
+      // TODO: load external resources, eg. Firebase.
     },
 
     detached: function() {
@@ -118,6 +172,42 @@ Example:
       // removed from a document.
       //
       // Use this to clean up anything you did in `attached`.
+    },
+
+    _computeFloorsAtSelection: function(_selectedSite) {
+      return [_alphaFloors, ['Level 3'], ['Level 1']][_siteNames.indexOf(_selectedSite)];
+    },
+
+    _onResponse: function() {
+      this.fire('current-reservations-ready');
+    },
+
+    _computeFloorStatus: function(_site, _notAlpha) {
+      if (_.isUndefined(_site) || _.isEmpty(_site)) {
+        return;
+      }
+
+      var _floorsToBeInspected = _alphaFloorsCode;
+      if (_notAlpha) {
+        _floorsToBeInspected = _notAlpha === 'beta' ? ['03level'] : ['01level'];
+      }
+
+      // check if some of the rooms are vacant.
+      return _floorsToBeInspected.map(function(el) {
+        return _site[el].some(function(el) {
+          return el.status === 'Vacant';
+        });
+      });
+    },
+    _isVacantFloor: function(_currentReservations, _selectedSite, _index) {
+      // _currentReservations is needed to trigger recalculate of class.
+      // once _currentReservations being fetched, class will be computed.
+      if (_.isUndefined(_currentReservations) || _.isEmpty(_currentReservations)) {
+        return '';
+      }
+
+      var _siteStatus = _statusCodes[_siteNames.indexOf(_selectedSite)];
+      return this[_siteStatus][_index] ? '' : ' fully-occupied';
     },
 
 

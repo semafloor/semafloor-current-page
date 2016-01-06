@@ -20,7 +20,7 @@
         box-sizing: border-box;
       }
 
-
+      /* site-selectable */
       iron-selector {
         border-bottom: 1px solid #ddd;
         padding: 8px;
@@ -42,6 +42,39 @@
         box-shadow: 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
         color: #1ddbd8;
         font-weight: 800;
+      }
+
+      /* iron-pages */
+      iron-pages {
+        /*padding: 0 24px;*/
+      }
+      div.each-floor-status {
+        position: absolute;
+        left: 8px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 5px;
+        background-color: #76FF03;
+        border: 1px solid #4CAF50;
+      }
+      div.each-floor-status.fully-occupied {
+        background-color: #F50057;
+        border: 1px solid #F44336;
+      }
+      /*div.each-floor-status.reserved {
+        background-color: #FFC400;
+        border: 1px solid #FF5722;
+      }*/
+      div.each-floor {
+        height: 64px;
+        padding-left: 24px;
+        border-bottom: 1px solid #ddd;
+        text-transform: capitalize;
+        @apply(--layout-vertical);
+        @apply(--layout-center-justified);
+      }
+      div.each-floor > span {
       }
 
 
