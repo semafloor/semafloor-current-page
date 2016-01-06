@@ -64,15 +64,41 @@ Example:
       <div page="floor">
         <iron-list items="[[_floorsAtSelectedSite]]" index-as="index">
           <template strip-whitespace>
-            <div class="each-floor">
+            <div class="each-floor" on-tap="_unveilFloor" floor$="[[item]]">
               <div class$="each-floor-status[[_isVacantFloor(_currentReservations, selectedSite, index)]]"></div>
               [[item]]
             </div>
           </template>
         </iron-list>
       </div>
-      <div page="room">
-        Lorem ipsum dolor sit amet.
+
+      <div page="room" class="room-page">
+        <div class="site-selectable floor-selectable" on-tap="_backSite">[[selectedFloorName]]</div>
+        <iron-list items="[[_roomsAtSelectedFloor]]" index-as="index">
+          <template strip-whitespace>
+            <div class="each-floor" on-tap="_unveilRoom" room$="[[item.room]]">
+              <div class$="each-floor-status[[_isVacantRoom(item.status)]]"></div>
+              [[item.name]]
+            </div>
+          </template>
+        </iron-list>
+      </div>
+
+      <div page="info" class="info-page">
+        <div class="info-selection">
+          <div class="site-selectable floor-selectable" on-tap="_backSite">[[selectedFloorName]]</div>
+          <div class="site-selectable floor-selectable" on-tap="_backRoom">[[selectedRoomName]]</div>
+        </div>
+        <template is="dom-repeat" items="[[_infoAtSelectedRoom]]" index-as="index" strip-whitespace>
+          <div class="each-floor">
+            [[item.locked]]
+            [[item.name]]
+            [[item.person]]
+            [[item.status]]
+            [[item.subject]]
+            [[item.time]]
+          </div>
+        </template>
       </div>
     </iron-pages>
 
@@ -95,6 +121,18 @@ Example:
       selectedSite: {
         type: String,
         value: 'KLB - Tower 5'
+      },
+      selectedFloor: {
+        type: String,
+        value: '13level'
+      },
+      selectedFloorName: {
+        type: String,
+        value: 'Level 13'
+      },
+      selectedRoomName: {
+        type: String,
+        value: 'El Psy Kongroo'
       },
 
       _selectedPage: {
@@ -139,10 +177,24 @@ Example:
         },
         computed: '_computeFloorStatus(_currentReservations.gamma, "gamma")'
       },
+      _roomsAtSelectedFloor: {
+        type: Array,
+        value: function() {
+          return [];
+        },
+        computed: '_computeRoomsAtSelection(selectedSite, selectedFloor)'
+      },
+      _infoAtSelectedRoom: {
+        type: Array,
+        value: function() {
+          return [];
+        }
+      },
 
     },
 
     observers: [
+      '_whenSelectedSiteChanged(selectedSite)'
     ],
 
     // Element Lifecycle
@@ -174,14 +226,19 @@ Example:
       // Use this to clean up anything you did in `attached`.
     },
 
-    _computeFloorsAtSelection: function(_selectedSite) {
-      return [_alphaFloors, ['Level 3'], ['Level 1']][_siteNames.indexOf(_selectedSite)];
-    },
-
     _onResponse: function() {
       this.fire('current-reservations-ready');
     },
 
+    _computeFloorsAtSelection: function(_selectedSite) {
+      return [_alphaFloors, ['Level 3'], ['Level 1']][_siteNames.indexOf(_selectedSite)];
+    },
+    _whenSelectedSiteChanged: function(_selectedSite) {
+      // go back to floor page when select on another site at floor page.
+      if (this._selectedPage !== 'floor') {
+        this.set('_selectedPage', 'floor');
+      }
+    },
     _computeFloorStatus: function(_site, _notAlpha) {
       if (_.isUndefined(_site) || _.isEmpty(_site)) {
         return;
@@ -209,7 +266,63 @@ Example:
       var _siteStatus = _statusCodes[_siteNames.indexOf(_selectedSite)];
       return this[_siteStatus][_index] ? '' : ' fully-occupied';
     },
+    _unveilFloor: function(ev) {
+      var _target = ev.target;
 
+      if (_target && _target.hasAttribute('floor')) {
+        var _floor = (ev.model.item).toLowerCase();
+        this.set('selectedFloor', _floor === 'level 3a' ? '04level' :
+          _alphaFloorsCode[_alphaFloors.indexOf(_floor)]);
+        this.set('selectedFloorName', _floor === 'level 3a' ? 'level 3A' : _floor);
+        this.set('_selectedPage', 'room');
+      }
+    },
+    _backSite: function() {
+      this.set('selectedFloor', null);
+      this.set('selectedFloorName', null);
+      this.set('_selectedPage', 'floor');
+    },
+
+    _computeRoomsAtSelection: function(_selectedSite, _selectedFloor) {
+      // do nothing when _currentReservations is empty/ undefined OR
+      // _selectedFloor is null (intended feature at _backFloor)
+      if (_.isUndefined(this._currentReservations) ||
+        _.isEmpty(this._currentReservations) || _.isEmpty(_selectedFloor)) {
+          return [];
+      }
+
+      var _decodedSite =
+        ['alpha', 'beta', 'gamma'][_siteNames.indexOf(_selectedSite)];
+      // console.log(_selectedFloor, this._currentReservations[_selectedSite][_selectedFloor]);
+      return this._currentReservations[_decodedSite][_selectedFloor];
+    },
+    _unveilRoom: function(ev) {
+      console.log(ev.model.item);
+      console.log(ev.model.item.name);
+      // console.log(ev.model.selectedSite);
+      var _target = ev.target;
+
+      if (_target && _target.hasAttribute('room')) {
+        this.set('_infoAtSelectedRoom', [ev.model.item]);
+        this.set('selectedRoomName', ev.model.item.name);
+        this.set('_selectedPage', 'info');
+      }
+    },
+    _backRoom: function() {
+      this.set('selectedRoomName', null);
+      this.set('_selectedPage', 'room');
+    },
+    _isVacantRoom: function(_status) {
+      var _cls = '';
+
+      if (_status === 'Occupied') {
+        _cls = ' fully-occupied';
+      }else if (_status === 'Reserved') {
+        _cls = ' reserved';
+      }
+
+      return _cls;
+    },
 
   });
 

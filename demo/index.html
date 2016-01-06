@@ -14,7 +14,8 @@
     <style is="custom-style">
       body {
         margin: 0;
-        @apply(--paper-font-common-base);
+        font-family: 'Roboto', 'Noto', sans-serif;
+        -webkit-font-smoothing: antialiased;
       }
 
       app-header {
@@ -52,10 +53,16 @@
         <!-- 55 nodes element on CH/ OP before optimization -->
         <!-- 47 nodes element on FF before optimization -->
 
+        <!-- 28 nodes clean on CH/ OP after optimization-->
+        <!-- 31 nodes clean on FF after optimization -->
+        <!-- 34 nodes app shell on CH/ OP after optimization -->
+        <!-- 34 nodes app shell on FF after optimization -->
+        <!-- 63 nodes element on CH/ OP after optimization -->
+        <!-- 63 nodes element on FF after optimization -->
+
         <semafloor-current-page></semafloor-current-page>
       </app-header-layout>
     </app-drawer-layout>
-
 
     <script>
       var seedElement = document.querySelector('semafloor-current-page');
