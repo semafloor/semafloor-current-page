@@ -2,14 +2,25 @@
 <link rel="import" href="semafloor-current-page-theme.html">
 <link rel="import" href="semafloor-current-page-icons.html">
 
+<link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
+
+<!--
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
+<link rel="import" href="../iron-list/iron-list.html">
 
-<link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-item/paper-icon-item.html">
+<link rel="import" href="../paper-tabs/paper-tabs.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
+
+<link rel="import" href="../neon-animation/neon-animated-pages.html">
+<link rel="import" href="../neon-animation/neon-animatable.html">
+<link rel="import" href="../neon-animation/neon-animations.html">
+ -->
 
 <script src="../lodash/lodash.min.js" charset="utf-8"></script>
 
@@ -30,97 +41,30 @@ Example:
   <template strip-whitespace>
     <style include="semafloor-current-page-theme"></style>
 
-    <iron-ajax id="currentAjax"
+    <!-- <iron-ajax id="currentAjax"
       auto
       url="[[_currentReservationsURL]]"
       handle-as="json"
       on-response="_onResponse"
-      last-response="{{_currentReservations}}"></iron-ajax>
+      last-response="{{_currentReservations}}"></iron-ajax> -->
 
-    <paper-icon-item class="site-search" name="alphaSite" on-tap="_toggleCollapsible">
-      <iron-icon icon="icons:language" item-icon></iron-icon>
-      <span>KLB - Tower 5</span>
-    </paper-icon-item>
-    <iron-collapse id="alphaSite">
-      <div class="collapsible-column">
-        <template is="dom-repeat" items="[[_alphaFloors]]" index-as="index" strip-whitespace>
-          <paper-button raised site="alpha" on-tap="_unveilFloor">
-            <div class$="floor-status[[_computeAlphaStatus(index, item)]]"></div>
-            <span>[[item]]</span>
-          </paper-button>
-        </template>
+    <iron-selector selected="{{selectedSite}}" attr-for-selected="site">
+      <div class="site-selectable" site="KLB - Tower 5">
+        <iron-icon icon="icons:language"></iron-icon>KLB - Tower 5
       </div>
-    </iron-collapse>
+      <div class="site-selectable" site="KLB - Tower 2A">
+        <iron-icon icon="icons:trending-up"></iron-icon>KLB - Tower 2A
+      </div>
+      <div class="site-selectable" site="SUITE">
+        <iron-icon icon="icons:group-work"></iron-icon>SUITE
+      </div>
+    </iron-selector>
+    <iron-pages selected="[[selectedSite]]" attr-for-selected="site">
+      <div site="KLB - Tower 5">One</div>
+      <div site="KLB - Tower 2A">Two</div>
+      <div site="SUITE">Three</div>
+    </iron-pages>
 
-    <paper-icon-item class="site-search" name="betaSite" on-tap="_toggleCollapsible">
-      <iron-icon icon="icons:trending-up" item-icon></iron-icon>
-      <span>KLB - Tower 2A</span>
-    </paper-icon-item>
-    <iron-collapse id="betaSite">
-      <div class="collapsible-column">
-        <paper-button raised site="beta" on-tap="_unveilFloor">
-          <div class$="floor-status[[_computeBetaStatus(_betaStatus)]]"></div>
-          <span>Level 3</span>
-        </paper-button>
-      </div>
-    </iron-collapse>
-
-    <paper-icon-item class="site-search" name="gammaSite" on-tap="_toggleCollapsible">
-      <iron-icon icon="icons:group-work" item-icon></iron-icon>
-      <span>SUITE</span>
-    </paper-icon-item>
-    <iron-collapse id="gammaSite">
-      <div class="collapsible-column">
-        <paper-button raised site="gamma" on-tap="_unveilFloor">
-          <div class$="floor-status[[_computeGammaStatus(_gammaStatus)]]"></div>
-          <span>Level 1</span>
-        </paper-button>
-      </div>
-    </iron-collapse>
-
-    <!-- dialog for each floor -->
-    // TODO: Finish floorDialog.
-    <paper-dialog id="floorDialog">
-      <h2>Header</h2>
-      <paper-dialog-scrollable>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Expedita quo quis ipsam pariatur voluptatum vitae, veniam voluptatibus, magni maxime laudantium consequatur est vero inventore. Obcaecati tempora asperiores magni, eius culpa ullam illum maiores deleniti, beatae mollitia aliquam blanditiis quod odit facilis dolorum? Explicabo pariatur quas deleniti doloribus velit quisquam. Laboriosam inventore facilis, rerum laudantium est molestias ut architecto placeat? Nisi dolorum veniam sunt, aspernatur cumque voluptas placeat debitis, dolor blanditiis quae quibusdam, incidunt nesciunt molestias cum recusandae voluptatibus, qui asperiores eligendi tempora numquam. Maiores repellat quos facilis error quibusdam fuga, consectetur omnis quisquam. Eveniet ipsa, porro ipsam sit accusamus in saepe minima id officiis, recusandae dolorem est aliquid nihil rerum voluptatibus doloremque quod. Reiciendis esse culpa consequuntur temporibus adipisci recusandae optio veniam deserunt praesentium itaque corrupti illo voluptate neque expedita quis, veritatis voluptates obcaecati consectetur doloribus est dolorum, consequatur. Facilis quia molestiae, impedit eaque amet corporis minus laudantium, enim ipsam natus eius necessitatibus quam quidem nemo ad nostrum at optio explicabo voluptatum magni, veritatis voluptate numquam? Error ducimus debitis aliquam. Suscipit sit odio assumenda eligendi, temporibus cum, recusandae voluptatum repellat illo in rem at repudiandae explicabo, asperiores quis ex aspernatur numquam iusto sunt magni! In, natus aperiam ipsa laudantium veniam.
-      </paper-dialog-scrollable>
-      <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button dialog-confirm>Accept</paper-button>
-      </div>
-    </paper-dialog>
-    <!-- <div class="no-padding">
-      <div class="fake-toolbar">
-        <paper-icon-button icon="icons:close" dialog-dismiss on-tap="_closeDialog"></paper-icon-button>
-        [[_site]] [[_floor]]
-      </div>
-
-    <div class="dialog-main-content">
-      <template is="dom-repeat" items="[[_roomsAtFloor]]" index-as="index" strip-whitespace>
-        <paper-icon-item class$="each-room[[_isLocked(item.locked)]]" room$="[[_computeRoomname(item.name)]]" on-tap="_toggleRoomCollapsible">
-          <iron-icon icon="icons:radio-button-[[_isVacantChecked(item.status)]]" item-icon class$="[[_isVacant(item.status)]]"></iron-icon>
-          <iron-icon class="room-lock" icon="icons:lock[[_computeLocked(item.locked)]]"></iron-icon>
-          [[item.name]]
-          <div class="room-collapsible-time">[[item.time]]</div>
-        </paper-icon-item>
-        <iron-collapse id$="[[_computeRoomname(item.name)]]" class="room-collapsible-container">
-          <div class="room-collapsible-item">
-            Person
-            <span class="room-collapsible-item-data">[[item.person]]</span>
-          </div>
-          <div class="room-collapsible-item">
-            Subject
-            <span class="room-collapsible-item-data">[[item.subject]]</span>
-          </div>
-          <div class="room-collapsible-item">
-            Time
-            <div class="room-collapsible-item-data">[[item.time]]</div>
-          </div>
-        </iron-collapse>
-      </template>
-    </div>
-  </div> -->
   </template>
 
 </dom-module>
@@ -136,24 +80,14 @@ Example:
     is: 'semafloor-current-page',
 
     properties: {
-      _alphaFloors: Array,
-      _openedCollapsible: String,
-      _floor: String,
-      _site: String,
-      _currentReservationsURL: String,
-      _currentReservations: Object,
-      _floorData: Array,
-      _siteData: String,
-      _roomsAtFloor: Array,
-      _openedRoomCollapsible: String,
-      _alphaStatus: Array,
-      _betaStatus: Boolean,
-      _gammaStatus: Boolean,
-
+      selectedSite: {
+        type: String,
+        value: 'KLB - Tower 5'
+      },
     },
 
     observers: [
-      '_computeFloorStatus(_currentReservations)'
+
     ],
 
     // Element Lifecycle
@@ -186,199 +120,6 @@ Example:
       // Use this to clean up anything you did in `attached`.
     },
 
-    _toggleCollapsible: function (ev) {
-      var _target = ev.target;
-
-      while (_target && _target.tagName !== 'PAPER-ICON-ITEM') {
-        _target = _target.parentElement;
-      }
-
-      if (_target && _target.hasAttribute('name')) {
-        var _name = _target.getAttribute('name');
-        var _opened = this._openedCollapsible;
-
-        // allow only 1 opened collapsible at one time.
-        if (_opened && _opened !== _name) {
-          this.$[_opened].hide();
-        }else {
-          // reset when toggling the same collapsible.
-          this.set('_openedCollapsible', '');
-        }
-        // set current as previous for the next toggle.
-        this.set('_openedCollapsible', _name);
-        // toggle collapsible.
-        this.$[_name].toggle();
-        // set unused var null.
-        _target = null; _name = null; _opened = null;
-      }
-    },
-
-    _unveilFloor: function (ev) {
-      var _target = ev.target;
-
-      while (_target && _target.tagName !== 'PAPER-BUTTON') {
-        _target = _target.parentElement;
-      }
-
-      if (_target && _target.hasAttribute('site')) {
-        var _site = _target.getAttribute('site');
-        var _siteIdx = _.indexOf(['alpha', 'beta', 'gamma'], _site);
-        var _floor = _.trim(_target.innerText);
-        var _floorIdx = _.indexOf(_alphaFloors, String.prototype.toLowerCase.call(_floor));
-        // set url null, so that to read latest data.
-        this.set('_currentReservationsURL', null);
-        // reset dialog content first.
-        this.set('_roomsAtFloor', null);
-
-        // setting dialog title.
-        this.set('_floor', _floor);
-        this.set('_site', _betaSites[_siteIdx]);
-        // tell which floor data is needed.
-        this.set('_floorData', _alphaFloorsCode[_floorIdx]);
-        this.set('_siteData', _site);
-        // make ajax call.
-        this.set('_currentReservationsURL', '../json/current-reservations.json');
-        // close opened collapsible first to get rid of the scroller.
-        this.$[this._openedCollapsible].hide();
-        // open dialog.
-        this.$.floorDialog.open();
-        // set unused var null.
-        _target = null; _site = null; _siteIdx = null; _floor = null; _floorIdx = null;
-      }
-    },
-
-    _onResponse: function (ev) {
-      // when response and floor is received...
-      if (this._currentReservations && this._siteData && this._floorData) {
-        this.set('_roomsAtFloor', this._currentReservations[this._siteData][this._floorData])
-        // set unused properties null, will skip this execution when not unveiling floor.
-        this.set('_siteData', null);
-        this.set('_floorData', null);
-      }
-    },
-
-    _isVacant: function (_status) {
-      switch (_status) {
-        case 'Vacant':
-          return 'room-is-vacant';
-          break;
-        case 'Occupied':
-          return 'room-is-occupied';
-          break;
-        case 'Reserved':
-          return 'room-is-reserved';
-          break;
-        default:
-          console.log('Error! ' + _status + ' not found.');
-      }
-    },
-    _isVacantChecked: function (_status) {
-      switch (_status) {
-        case 'Vacant':
-          return 'unchecked';
-          break;
-        case 'Occupied':
-        case 'Reserved':
-          return 'checked';
-          break;
-        default:
-          console.log('Error! ' + _status + ' not found.');
-      }
-    },
-
-    _toggleRoomCollapsible: function (ev) {
-      var _target = ev.target;
-
-      while (_target && _target.tagName !== 'PAPER-ICON-ITEM') {
-        _target = _target.parentElement;
-      }
-
-      if (_target && _target.hasAttribute('room')) {
-        var _room = _target.getAttribute('room');
-        var _opened = this._openedRoomCollapsible;
-
-        // allow only 1 opened collapsible at one time.
-        if (_opened && _opened !== _room) {
-          this.$$('#' + _opened).hide();
-        }else {
-          // reset when toggling the same collapsible.
-          this.set('_openedRoomCollapsible', '');
-        }
-        // save current one as previous for the next toggle.
-        this.set('_openedRoomCollapsible', _room);
-        // toggle collapsible.
-        this.$$('#' + _room).toggle();
-        // set unused var null.
-        _target = null; _room = null; _opened = null;
-      }
-    },
-
-    _computeRoomname: function (_name) {
-      return _.camelCase(_name);
-    },
-
-    _closeDialog: function (ev) {
-      // PART 1: set url null...
-      this.set('_currentReservationsURL', null);
-      // set _alphaFloors null, to trigger compute class.
-      this.set('_alphaFloors', null);
-      // this.set('_alphaFloors', null);
-      // hide all opened collapsible and set null when closing dialog.
-      if (this._openedRoomCollapsible) {
-        this.$$('#' + this._openedRoomCollapsible).hide();
-        this.set('_openedRoomCollapsible', '');
-      }
-      // PART 2: ...so that to read latest data.
-      this.set('_currentReservationsURL', '../json/current-reservations.json');
-      // this.set('_alphaFloors', _alphaFloors);
-    },
-
-    _computeFloorStatus: function (_json) {
-      var _alphaStat = [];
-      var _betaStat, _gammaStat;
-      // when the first el is of value 'Vacant', it stops iterating.
-      for (var i = 0; i < _alphaFloors.length; i++) {
-        var _stat = _json.alpha[_alphaFloorsCode[i]].some(function (el) {
-          return el.status === 'Vacant';
-        });
-        _alphaStat.push(_stat);
-        _stat = null; // set null.
-      }
-      _betaStat = _json.beta['03level'].some(function (el) {
-        return el.status === 'Vacant';
-      });
-      _gammaStat = _json.gamma['01level'].some(function (el) {
-        return el.status === 'Vacant';
-      });
-
-      // set the array with all the status of all floors.
-      this.set('_alphaStatus', _alphaStat);
-      this.set('_betaStatus', _betaStat);
-      this.set('_gammaStatus', _gammaStat);
-      // then, set the _alphaFloors to dynamically generate floors' elements.
-      this.set('_alphaFloors', _alphaFloors);
-      // set unused var null.
-      _alphaStat = null; _betaStat = null; _gammaStat = null;
-    },
-
-    _computeAlphaStatus: function (_idx) {
-      if (!_.isUndefined(_idx) && !_.isUndefined(this._alphaStatus)) {
-        return this._alphaStatus[_idx] ? ' vacant-room' : ' no-vacant-room';
-      }
-    },
-    _computeBetaStatus: function (_betaStatus) {
-      return _betaStatus ? ' vacant-room' : ' no-vacant-room';
-    },
-    _computeGammaStatus: function (_gammaStatus) {
-      return _gammaStatus ? ' vacant-room' : ' no-vacant-room';
-    },
-
-    _computeLocked: function (_locked) {
-      return _locked ? '' : '-open';
-    },
-    _isLocked: function (_locked) {
-      return _locked ? ' is-locked' : '';
-    },
 
   });
 
