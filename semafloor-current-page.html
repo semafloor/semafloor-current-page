@@ -2,13 +2,15 @@
 <link rel="import" href="semafloor-current-page-theme.html">
 <link rel="import" href="semafloor-current-page-icons.html">
 
-<link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../iron-selector/iron-selector.html">
 <link rel="import" href="../iron-list/iron-list.html">
 
-<script src="../lodash/lodash.min.js" charset="utf-8"></script>
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
 
+<link rel="import" href="../firebase-element/firebase-collection.html">
+
+<script src="../lodash/lodash.min.js" charset="utf-8"></script>
 <!--
 An element providing a solution to no problem in particular.
 
@@ -26,12 +28,9 @@ Example:
   <template strip-whitespace>
     <style include="semafloor-current-page-theme"></style>
 
-    <iron-ajax id="currentAjax"
-      auto
-      url="[[_url]]"
-      handle-as="json"
-      on-response="_onResponse"
-      last-response="{{_currentReservations}}"></iron-ajax>
+    <firebase-collection id="listAjax"
+      location="[[_url]]" on-firebase-value="_onFirebaseValue">
+    </firebase-collection>
 
     <iron-selector selected="{{selectedSite}}" attr-for-selected="site">
       <div class="site-selectable" site="KLB - Tower 5">
@@ -46,8 +45,10 @@ Example:
     </iron-selector>
 
     <iron-pages selected="[[_selectedPage]]" attr-for-selected="page">
+      <paper-spinner-lite page="waiting" active></paper-spinner-lite>
+
       <div page="floor">
-        <iron-list items="[[_floorsAtSelectedSite]]" index-as="index">
+        <iron-list id="floorsList" items="[[_floorsAtSelectedSite]]" index-as="index">
           <template strip-whitespace>
             <div class="each-floor" on-tap="_unveilFloor" floor$="[[item]]">
               <div class$="each-floor-status[[_isVacantFloor(_currentReservations, selectedSite, index)]]"></div>
@@ -59,7 +60,7 @@ Example:
 
       <div page="room" class="room-page">
         <div class="site-selectable floor-selectable" on-tap="_backSite">[[selectedFloorName]]</div>
-        <iron-list items="[[_roomsAtSelectedFloor]]" index-as="index">
+        <iron-list id="roomsList" items="[[_roomsAtSelectedFloor]]" index-as="index">
           <template strip-whitespace>
             <div class="each-floor" on-tap="_unveilRoom" room$="[[item.room]]">
               <div class$="each-floor-status[[_isVacantRoom(item.status)]]"></div>
@@ -69,38 +70,30 @@ Example:
         </iron-list>
       </div>
 
+      <!-- TODO: (Priority: Low) updated info page when on-firebase-value fires. -->
       <div page="info" class="info-page">
         <div class="info-selection">
           <div class="site-selectable floor-selectable" on-tap="_backSite">[[selectedFloorName]]</div>
           <div class="site-selectable floor-selectable" on-tap="_backRoom">[[selectedRoomName]]</div>
         </div>
         <template is="dom-repeat" items="[[_infoAtSelectedRoom]]" index-as="index" strip-whitespace>
-            <!--
-            [[item.locked]]
-            [[item.name]]
-            [[item.person]]
-            [[item.status]]
-            [[item.subject]]
-            [[item.time]]
-             -->
-             <!-- TODO: deal with empty properties -->
-            <div class="each-floor each-info">
-              <iron-icon class="info-status" icon="icons:radio-button-unchecked"></iron-icon>
+            <div class="each-floor each-info-name">
+              <iron-icon class$="info-status[[_isVacantRoom(item.status)]]" icon="icons:radio-button-[[_isRoomOccupied(item.status)]]"></iron-icon>
 
               <div class="info-title">
                 [[item.name]]
                 <div class="info-locked">
-                  <iron-icon icon="icons:lock"></iron-icon>[[_infoLockedMsg]]
+                  <iron-icon class$="info-lock[[_isRoomLocked(item.locked)]]" icon="icons:lock[[_isRoomLocked(item.locked)]]"></iron-icon>[[_isRoomLockedMsg(item.locked)]]
                 </div>
               </div>
             </div>
-            <div class="each-floor">
+            <div class="each-info">
               Person<span>[[item.person]]</span>
             </div>
-            <div class="each-floor">
+            <div class="each-info">
               Subject<span>[[item.subject]]</span>
             </div>
-            <div class="each-floor">
+            <div class="each-info">
               Time<span>[[item.time]]</span>
             </div>
         </template>
@@ -113,8 +106,12 @@ Example:
 
 <script>
 
-  var _alphaFloors = ['level 1','level 2','level 3','level 3A','level 5','level 6','level 7','level 8','level 9','level 10','level 11','level 12'];
-  var _alphaFloorsCode = ['01level','02level','03level','04level','05level','06level','07level','08level','09level','10level','11level','12level'];
+  var _alphaFloors = [
+    'level 1','level 2','level 3','level 3A','level 5','level 6',
+    'level 7','level 8','level 9','level 10','level 11','level 12'];
+  var _alphaFloorsCode = [
+    '01level','02level','03level','04level','05level','06level',
+    '07level','08level','09level','10level','11level','12level'];
   var _siteNames = ['KLB - Tower 5','KLB - Tower 2A','SUITE'];
   var _statusCodes = ['_alphaStatus', '_betaStatus', '_gammaStatus'];
 
@@ -149,7 +146,7 @@ Example:
         value: function() {
             return _alphaFloors;
         },
-        computed: '_computeFloorsAtSelection(selectedSite)'
+        computed: '_computeFloorsAtSelection(selectedSite, _currentReservations)'
       },
       _currentReservations: {
         type: Object,
@@ -159,7 +156,7 @@ Example:
       },
       _url: {
         type: String,
-        value: '../json/current-reservations.json'
+        value: 'https://semafloor-webapp.firebaseio.com/json/current-reservations'
       },
       _alphaStatus: {
         type: Array,
@@ -187,18 +184,12 @@ Example:
         value: function() {
           return [];
         },
-        computed: '_computeRoomsAtSelection(selectedSite, selectedFloor)'
+        computed: '_computeRoomsAtSelection(selectedSite, selectedFloor, _currentReservations)'
       },
       _infoAtSelectedRoom: {
         type: Array,
         value: function() {
           return [];
-        }
-      },
-      _infoLockedMsg: {
-        type: String,
-        value: function() {
-          return 'This room is restricted not for public use.'
         }
       },
 
@@ -209,6 +200,11 @@ Example:
     ],
 
     // Element Lifecycle
+    created: function() {
+      console.log('semafloor-current-created');
+      console.time('semafloor-current-ready');
+      console.time('semafloor-current-attached');
+    },
 
     ready: function() {
       // `ready` is called after all elements have been configured, but
@@ -217,6 +213,7 @@ Example:
       //
       // This is the point where you should make modifications to the DOM (when
       // necessary), or kick off any processes the element wants to perform.
+      console.timeEnd('semafloor-current-ready');
     },
 
     attached: function() {
@@ -228,6 +225,7 @@ Example:
       // loading resources, etc).
 
       // TODO: load external resources, eg. Firebase.
+      console.timeEnd('semafloor-current-attached');
     },
 
     detached: function() {
@@ -235,14 +233,27 @@ Example:
       // removed from a document.
       //
       // Use this to clean up anything you did in `attached`.
+      console.log('semafloor-current-detached');
     },
 
-    _onResponse: function() {
+    _onFirebaseValue: function(ev) {
+      console.log('on-firebase-value');
+      // set _currentReservations when data is fetched.
+      this.set('_currentReservations', ev.detail.val());
+      // hide spinner and switch to room page.
+      if (this.selectedFloor !== '13level' && this._selectedPage === 'waiting') {
+        this.set('_selectedPage', 'room');
+      }
+      // update all lists to update the fetched data.
+      this.$.floorsList.fire('iron-resize');
+      this.$.roomsList.fire('iron-resize');
+      // fire an event when data is fetched.
       this.fire('current-reservations-ready');
     },
 
     _computeFloorsAtSelection: function(_selectedSite) {
-      return [_alphaFloors, ['Level 3'], ['Level 1']][_siteNames.indexOf(_selectedSite)];
+      return [_alphaFloors, ['Level 3'],
+        ['Level 1']][_siteNames.indexOf(_selectedSite)];
     },
     _whenSelectedSiteChanged: function(_selectedSite) {
       // go back to floor page when select on another site at floor page.
@@ -270,7 +281,7 @@ Example:
     _isVacantFloor: function(_currentReservations, _selectedSite, _index) {
       // _currentReservations is needed to trigger recalculate of class.
       // once _currentReservations being fetched, class will be computed.
-      if (_.isUndefined(_currentReservations) || _.isEmpty(_currentReservations)) {
+      if (_.isEmpty(_currentReservations) || _.isUndefined(_currentReservations)) {
         return '';
       }
 
@@ -285,7 +296,12 @@ Example:
         this.set('selectedFloor', _floor === 'level 3a' ? '04level' :
           _alphaFloorsCode[_alphaFloors.indexOf(_floor)]);
         this.set('selectedFloorName', _floor === 'level 3a' ? 'level 3A' : _floor);
-        this.set('_selectedPage', 'room');
+        if (_.isEmpty(this._currentReservations) ||
+          _.isUndefined(this._currentReservations)) {
+          this.set('_selectedPage', 'waiting');
+        }else {
+          this.set('_selectedPage', 'room');
+        }
       }
     },
     _backSite: function() {
@@ -304,13 +320,9 @@ Example:
 
       var _decodedSite =
         ['alpha', 'beta', 'gamma'][_siteNames.indexOf(_selectedSite)];
-      // console.log(_selectedFloor, this._currentReservations[_selectedSite][_selectedFloor]);
       return this._currentReservations[_decodedSite][_selectedFloor];
     },
     _unveilRoom: function(ev) {
-      console.log(ev.model.item);
-      console.log(ev.model.item.name);
-      // console.log(ev.model.selectedSite);
       var _target = ev.target;
 
       if (_target && _target.hasAttribute('room')) {
@@ -333,6 +345,16 @@ Example:
       }
 
       return _cls;
+    },
+    _isRoomLocked: function(_locked) {
+      return _locked ? '' : '-open';
+    },
+    _isRoomLockedMsg: function(_locked) {
+      return _locked ? 'This room has restricted access to the public.' :
+        'This room is open to the public.';
+    },
+    _isRoomOccupied: function(_status) {
+      return _status.toLowerCase() === 'vacant' ? 'unchecked' : 'checked';
     },
 
   });
