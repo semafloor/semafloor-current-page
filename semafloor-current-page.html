@@ -75,14 +75,34 @@ Example:
           <div class="site-selectable floor-selectable" on-tap="_backRoom">[[selectedRoomName]]</div>
         </div>
         <template is="dom-repeat" items="[[_infoAtSelectedRoom]]" index-as="index" strip-whitespace>
-          <div class="each-floor">
+            <!--
             [[item.locked]]
             [[item.name]]
             [[item.person]]
             [[item.status]]
             [[item.subject]]
             [[item.time]]
-          </div>
+             -->
+             <!-- TODO: deal with empty properties -->
+            <div class="each-floor each-info">
+              <iron-icon class="info-status" icon="icons:radio-button-unchecked"></iron-icon>
+
+              <div class="info-title">
+                [[item.name]]
+                <div class="info-locked">
+                  <iron-icon icon="icons:lock"></iron-icon>[[_infoLockedMsg]]
+                </div>
+              </div>
+            </div>
+            <div class="each-floor">
+              Person<span>[[item.person]]</span>
+            </div>
+            <div class="each-floor">
+              Subject<span>[[item.subject]]</span>
+            </div>
+            <div class="each-floor">
+              Time<span>[[item.time]]</span>
+            </div>
         </template>
       </div>
     </iron-pages>
@@ -173,6 +193,12 @@ Example:
         type: Array,
         value: function() {
           return [];
+        }
+      },
+      _infoLockedMsg: {
+        type: String,
+        value: function() {
+          return 'This room is restricted not for public use.'
         }
       },
 
