@@ -1,1 +1,106 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=semafloor-current-page-theme.html><link rel=import href=semafloor-current-page-icons.html><link rel=import href=../iron-pages/iron-pages.html><link rel=import href=../iron-selector/iron-selector.html><link rel=import href=../iron-list/iron-list.html><link rel=import href=../paper-spinner/paper-spinner-lite.html><link rel=import href=../firebase-element/firebase-collection.html><script src=../lodash/lodash.min.js charset=utf-8></script><dom-module id=semafloor-current-page><template strip-whitespace><style include=semafloor-current-page-theme></style><firebase-collection id=listAjax location=[[_url]] on-firebase-value=_onFirebaseValue></firebase-collection><iron-selector selected={{selectedSite}} attr-for-selected=site><div class=site-selectable site="KLB - Tower 5"><iron-icon icon=icons:language></iron-icon>KLB - Tower 5</div><div class=site-selectable site="KLB - Tower 2A"><iron-icon icon=icons:trending-up></iron-icon>KLB - Tower 2A</div><div class=site-selectable site=SUITE><iron-icon icon=icons:group-work></iron-icon>SUITE</div></iron-selector><iron-pages selected=[[_selectedPage]] attr-for-selected=page><paper-spinner-lite page=waiting active></paper-spinner-lite><div page=floor><iron-list id=floorsList items=[[_floorsAtSelectedSite]] index-as=index><template strip-whitespace><div class=each-floor on-tap=_unveilFloor floor$=[[item]]><div class$="each-floor-status[[_isVacantFloor(_currentReservations, selectedSite, index)]]"></div>[[item]]</div></template></iron-list></div><div page=room class=room-page><div class="site-selectable floor-selectable" on-tap=_backSite>[[selectedFloorName]]</div><iron-list id=roomsList items=[[_roomsAtSelectedFloor]] index-as=index><template strip-whitespace><div class=each-floor on-tap=_unveilRoom room$=[[item.room]]><div class$=each-floor-status[[_isVacantRoom(item.status)]]></div>[[item.name]]</div></template></iron-list></div><div page=info class=info-page><div class=info-selection><div class="site-selectable floor-selectable" on-tap=_backSite>[[selectedFloorName]]</div><div class="site-selectable floor-selectable" on-tap=_backRoom>[[selectedRoomName]]</div></div><template is=dom-repeat items=[[_infoAtSelectedRoom]] index-as=index strip-whitespace><div class="each-floor each-info-name"><iron-icon class$=info-status[[_isVacantRoom(item.status)]] icon=icons:radio-button-[[_isRoomOccupied(item.status)]]></iron-icon><div class=info-title>[[item.name]]<div class=info-locked><iron-icon class$=info-lock[[_isRoomLocked(item.locked)]] icon=icons:lock[[_isRoomLocked(item.locked)]]></iron-icon>[[_isRoomLockedMsg(item.locked)]]</div></div></div><div class=each-info>Person<span>[[item.person]]</span></div><div class=each-info>Subject<span>[[item.subject]]</span></div><div class=each-info>Time<span>[[item.time]]</span></div></template></div></iron-pages></template></dom-module><script src=semafloor-current-page.js charset=utf-8></script>
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="semafloor-current-page-theme.html">
+<link rel="import" href="semafloor-current-page-icons.html">
+
+<link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
+<link rel="import" href="../iron-list/iron-list.html">
+
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+
+<link rel="import" href="../firebase-element/firebase-collection.html">
+
+<script src="../lodash/lodash.min.js" charset="utf-8"></script>
+<!--
+An element providing a solution to no problem in particular.
+
+Example:
+
+    <semafloor-current-page></semafloor-current-page>
+
+@group Seed Elements
+@element semafloor-current-page
+@demo demo/index.html
+@hero hero.svg
+-->
+<dom-module id="semafloor-current-page">
+
+  <template strip-whitespace>
+    <style include="semafloor-current-page-theme"></style>
+
+    <firebase-collection id="listAjax"
+      location="[[_url]]" on-firebase-value="_onFirebaseValue">
+    </firebase-collection>
+
+    <iron-selector selected="{{selectedSite}}" attr-for-selected="site">
+      <div class="site-selectable" site="KLB - Tower 5">
+        <iron-icon icon="icons:language"></iron-icon>KLB - Tower 5
+      </div>
+      <div class="site-selectable" site="KLB - Tower 2A">
+        <iron-icon icon="icons:trending-up"></iron-icon>KLB - Tower 2A
+      </div>
+      <div class="site-selectable" site="SUITE">
+        <iron-icon icon="icons:group-work"></iron-icon>SUITE
+      </div>
+    </iron-selector>
+
+    <iron-pages selected="[[_selectedPage]]" attr-for-selected="page">
+      <paper-spinner-lite page="waiting" active></paper-spinner-lite>
+
+      <div page="floor">
+        <iron-list id="floorsList" items="[[_floorsAtSelectedSite]]" index-as="index">
+          <template strip-whitespace>
+            <div class="each-floor" on-tap="_unveilFloor" floor$="[[item]]">
+              <div class$="each-floor-status[[_isVacantFloor(_currentReservations, selectedSite, index)]]"></div>
+              [[item]]
+            </div>
+          </template>
+        </iron-list>
+      </div>
+
+      <div page="room" class="room-page">
+        <div class="site-selectable floor-selectable" on-tap="_backSite">[[selectedFloorName]]</div>
+        <iron-list id="roomsList" items="[[_roomsAtSelectedFloor]]" index-as="index">
+          <template strip-whitespace>
+            <div class="each-floor" on-tap="_unveilRoom" room$="[[item.room]]">
+              <div class$="each-floor-status[[_isVacantRoom(item.status)]]"></div>
+              [[item.name]]
+            </div>
+          </template>
+        </iron-list>
+      </div>
+
+      <!-- TODO: (Priority: Low) updated info page when on-firebase-value fires. -->
+      <div page="info" class="info-page">
+        <div class="info-selection">
+          <div class="site-selectable floor-selectable" on-tap="_backSite">[[selectedFloorName]]</div>
+          <div class="site-selectable floor-selectable" on-tap="_backRoom">[[selectedRoomName]]</div>
+        </div>
+        <template is="dom-repeat" items="[[_infoAtSelectedRoom]]" index-as="index" strip-whitespace>
+            <div class="each-floor each-info-name">
+              <iron-icon class$="info-status[[_isVacantRoom(item.status)]]" icon="icons:radio-button-[[_isRoomOccupied(item.status)]]"></iron-icon>
+
+              <div class="info-title">
+                [[item.name]]
+                <div class="info-locked">
+                  <iron-icon class$="info-lock[[_isRoomLocked(item.locked)]]" icon="icons:lock[[_isRoomLocked(item.locked)]]"></iron-icon>[[_isRoomLockedMsg(item.locked)]]
+                </div>
+              </div>
+            </div>
+            <div class="each-info">
+              Person<span>[[item.person]]</span>
+            </div>
+            <div class="each-info">
+              Subject<span>[[item.subject]]</span>
+            </div>
+            <div class="each-info">
+              Time<span>[[item.time]]</span>
+            </div>
+        </template>
+      </div>
+    </iron-pages>
+
+  </template>
+</dom-module>
+
+<script src="semafloor-current-page.js" charset="utf-8"></script>
