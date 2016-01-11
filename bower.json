@@ -1,6 +1,6 @@
 {
   "name": "semafloor-current-page",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "authors": [
     "semafloor <wes_ngrongsen@hotmail.com>"
   ],
@@ -25,7 +25,8 @@
     "iron-pages": "PolymerElements/iron-pages#~1.0.5",
     "iron-selector": "PolymerElements/iron-selector#~1.0.8",
     "firebase-element": "GoogleWebComponents/firebase-element#~1.0.9",
-    "paper-spinner": "PolymerElements/paper-spinner#~1.1.0"
+    "paper-spinner": "PolymerElements/paper-spinner#~1.1.0",
+    "semafloor-icons": "semafloor/semafloor-icons#~0.1.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
