@@ -1,1 +1,153 @@
-<link rel=import href=../polymer/polymer.html><dom-module id=semafloor-current-page-theme><template strip-whitespace><style>:host{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-tap-highlight-color:rgba(0,0,0,0);display:block}*,:after,:before,:host{box-sizing:border-box}iron-selector{border-bottom:1px solid #ddd;padding:8px;margin-bottom:8px;@apply(--layout-horizontal)}div.site-selectable{border:1px solid #ddd;color:#9e9e9e;border-radius:50px;font-size:10px;margin:0 3px;padding:3px;width:33.33333%;@apply(--layout-vertical);@apply(--layout-center-center)}div.site-selectable.iron-selected{border-color:#00897b;background-color:#00897b;color:#eee;box-shadow:0 5px 6px -3px rgba(0,0,0,.4);font-weight:800}div.each-floor-status{position:absolute;left:8px;width:8px;height:8px;border-radius:50%;margin-top:5px;background-color:#76ff03;border:1px solid #4caf50;pointer-events:none}div.each-floor-status.fully-occupied{background-color:#f50057;border:1px solid #f44336}div.each-floor-status.reserved{background-color:#ffc400;border:1px solid #ff5722}div.each-floor{height:64px;padding-left:24px;border-bottom:1px solid #ddd;text-transform:capitalize;@apply(--layout-horizontal);@apply(--layout-center)}div.info-selection>.site-selectable.floor-selectable,div.room-page>.site-selectable.floor-selectable{border-color:#00897b;background-color:#00897b;color:#eee;text-transform:capitalize;padding:6px;font-size:16px;min-height:24px;margin-left:16px;margin-bottom:8px;width:50%;box-shadow:0 5px 6px -3px rgba(0,0,0,.4);font-weight:800}div.info-selection{padding:8px;margin-bottom:8px;@apply(--layout-horizontal)}div.each-floor.each-info-name{min-height:128px;height:auto;font-size:38px;text-align:right;padding:16px 24px;background-color:#eceff1;@apply(--layout-justified)}div.each-info{height:64px;padding-left:24px;border-bottom:1px solid #ddd;text-transform:capitalize;@apply(--layout-vertical);@apply(--layout-center-justified)}div.each-info>span{color:#9e9e9e;font-size:14px;min-height:16px}div.info-title{color:#263238;text-transform:none}iron-icon.info-status{margin:16px}div.info-locked{font-size:11px}iron-icon.info-status{color:#00c853}iron-icon.info-status.fully-occupied{color:#d50000}iron-icon.info-status.reserved{color:#ff6d00}iron-icon.info-lock{color:#ff6f00}iron-icon.info-lock-open{color:#bcaaa4}paper-spinner-lite{display:block;margin:48px auto; --paper-spinner-color:#1ddbd8}</style></template></dom-module>
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="semafloor-current-page-theme">
+  <template strip-whitespace>
+    <style>
+      :host {
+        user-select: none;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+
+        display: block;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      /* site-selectable */
+      iron-selector {
+        border-bottom: 1px solid #ddd;
+        padding: 8px;
+        margin-bottom: 8px;
+        @apply(--layout-horizontal);
+      }
+      div.site-selectable {
+        border: 1px solid #ddd;
+        color: #9e9e9e;
+        border-radius: 50px;
+        font-size: 10px;
+        margin: 0 3px;
+        padding: 3px;
+        width: calc(100% / 3);
+        @apply(--layout-vertical);
+        @apply(--layout-center-center);
+      }
+      div.site-selectable.iron-selected {
+        border-color: #00897b;
+        background-color: #00897b;
+        color: #eee;
+        box-shadow: 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
+        font-weight: 800;
+      }
+
+      /*iron-pages {}*/
+      div.each-floor-status {
+        position: absolute;
+        left: 8px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 5px;
+        background-color: #76FF03;
+        border: 1px solid #4CAF50;
+        pointer-events: none;
+      }
+      div.each-floor-status.fully-occupied {
+        background-color: #F50057;
+        border: 1px solid #F44336;
+      }
+      div.each-floor-status.reserved {
+        background-color: #FFC400;
+        border: 1px solid #FF5722;
+      }
+      div.each-floor {
+        height: 64px;
+        padding-left: 24px;
+        border-bottom: 1px solid #ddd;
+        text-transform: capitalize;
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+      }
+
+      /*div.room-page {}*/
+      div.room-page > .site-selectable.floor-selectable,
+      div.info-selection > .site-selectable.floor-selectable {
+        border-color: #00897b;
+        background-color: #00897b;
+        color: #eee;
+        text-transform: capitalize;
+        padding: 6px;
+        font-size: 16px;
+        min-height: 24px;
+        margin-left: 16px;
+        margin-bottom: 8px;
+        width: calc(100% / 2);
+        box-shadow: 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
+        font-weight: 800;
+      }
+
+      /*div.info-page {}*/
+      div.info-selection {
+        padding: 8px;
+        margin-bottom: 8px;
+        @apply(--layout-horizontal);
+      }
+      div.each-floor.each-info-name {
+        min-height: 128px;
+        height: auto;
+        font-size: 38px;
+        text-align: right;
+        padding: 16px 24px;
+        background-color: #ECEFF1;
+        @apply(--layout-justified);
+      }
+      div.each-info {
+        height: 64px;
+        padding-left: 24px;
+        border-bottom: 1px solid #ddd;
+        text-transform: capitalize;
+        @apply(--layout-vertical);
+        @apply(--layout-center-justified);
+      }
+      div.each-info > span {
+        color: #9e9e9e;
+        font-size: 14px;
+        min-height: 16px;
+      }
+      div.info-title {
+        color: #263238;
+        text-transform: none;
+      }
+      iron-icon.info-status {
+        margin: 16px;
+      }
+      div.info-locked {
+        font-size: 11px;
+      }
+      iron-icon.info-status {
+        color: #00C853;
+      }
+      iron-icon.info-status.fully-occupied {
+        color: #D50000;
+      }
+      iron-icon.info-status.reserved {
+        color: #FF6D00;
+      }
+      iron-icon.info-lock {
+        color: #ff6f00;
+      }
+      iron-icon.info-lock-open {
+        color: #BCAAA4;
+      }
+
+      paper-spinner-lite {
+        display: block;
+        margin: 48px auto;
+        --paper-spinner-color: #1ddbd8;
+      }
+
+    </style>
+  </template>
+</dom-module>
