@@ -31,7 +31,7 @@ Polymer({
 
     _selectedPage: {
       type: String,
-      value: 'floor'
+      value: 'waiting'
     },
     _floorsAtSelectedSite: {
       type: Array,
@@ -93,9 +93,9 @@ Polymer({
 
   // Element Lifecycle
   created: function() {
-    console.log('semafloor-current-created');
-    console.time('semafloor-current-ready');
-    console.time('semafloor-current-attached');
+    // console.log('semafloor-current-created');
+    // console.time('semafloor-current-ready');
+    // console.time('semafloor-current-attached');
   },
 
   ready: function() {
@@ -105,7 +105,7 @@ Polymer({
     //
     // This is the point where you should make modifications to the DOM (when
     // necessary), or kick off any processes the element wants to perform.
-    console.timeEnd('semafloor-current-ready');
+    // console.timeEnd('semafloor-current-ready');
   },
 
   attached: function() {
@@ -117,7 +117,8 @@ Polymer({
     // loading resources, etc).
 
     // TODO: load external resources, eg. Firebase.
-    console.timeEnd('semafloor-current-attached');
+    this.fire('current-page-attached');
+    // console.timeEnd('semafloor-current-attached');
   },
 
   detached: function() {
@@ -125,11 +126,9 @@ Polymer({
     // removed from a document.
     //
     // Use this to clean up anything you did in `attached`.
-    console.log('semafloor-current-detached');
   },
 
   _onFirebaseValue: function(ev) {
-    console.log('on-firebase-value');
     // set _currentReservations when data is fetched.
     this.set('_currentReservations', ev.detail.val());
     // hide spinner and switch to room page.
@@ -141,6 +140,7 @@ Polymer({
     this.$.roomsList.fire('iron-resize');
     // fire an event when data is fetched.
     this.fire('current-reservations-ready');
+    console.log('on-firebase-value');
   },
 
   _computeFloorsAtSelection: function(_selectedSite) {
@@ -247,6 +247,12 @@ Polymer({
   },
   _isRoomOccupied: function(_status) {
     return _status.toLowerCase() === 'vacant' ? 'unchecked' : 'checked';
+  },
+
+  // workaround for importHref.
+  // Nothing shows when switch to other page while the page is loading even it's loaded.
+  updateCurrentPages: function() {
+    this.$.currentPages.notifyResize();
   },
 
 });
