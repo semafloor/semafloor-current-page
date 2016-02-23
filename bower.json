@@ -30,7 +30,7 @@
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "web-component-tester": "*",
-    "app-layout": "PolymerLabs/app-layout#~0.0.6",
+    "app-layout": "PolymerLabs/app-layout#~0.0.7",
     "semafloor-icons": "semafloor/semafloor-icons#~0.1.1",
     "paper-icon-button": "PolymerElements/paper-icon-button#~1.0.6"
   }
