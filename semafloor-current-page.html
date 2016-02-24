@@ -3,7 +3,6 @@
 
 <link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../iron-selector/iron-selector.html">
-<link rel="import" href="../iron-list/iron-list.html">
 
 <link rel="import" href="../paper-spinner/paper-spinner-lite.html">
 
@@ -45,29 +44,25 @@ Example:
       <paper-spinner-lite page="waiting" active></paper-spinner-lite>
 
       <div page="floor">
-        <iron-list id="floorsList" items="[[_floorsAtSelectedSite]]" index-as="index">
-          <template strip-whitespace>
-            <div class="each-floor" on-tap="_unveilFloor" floor$="[[item]]">
-              <div class$="each-floor-status[[_isVacantFloor(_currentReservations, selectedSite, index)]]"></div>
-              [[item]]
-            </div>
-          </template>
-        </iron-list>
+        <template is="dom-repeat" items="[[_floorsAtSelectedSite]]" index-as="index" strip-whitespace>
+          <div class="each-floor" on-tap="_unveilFloor" floor$="[[item]]">
+            <!-- <div class$="each-floor-status[[_isVacantFloor(_currentReservations, selectedSite, index)]]"></div> -->
+            <div class$="each-floor-status[[_isVacantFloor(_floorStatus, selectedSite, item)]]"></div>
+            [[item]]
+          </div>
+        </template>
       </div>
 
       <div page="room" class="room-page">
         <div class="site-selectable floor-selectable" on-tap="_backSite">[[selectedFloorName]]</div>
-        <iron-list id="roomsList" items="[[_roomsAtSelectedFloor]]" index-as="index">
-          <template strip-whitespace>
-            <div class="each-floor" on-tap="_unveilRoom" room$="[[item.room]]">
-              <div class$="each-floor-status[[_isVacantRoom(item.status)]]"></div>
-              [[item.name]]
-            </div>
-          </template>
-        </iron-list>
+        <template is="dom-repeat" items="[[_roomsAtSelectedFloor]]" index-as="index" strip-whitespace>
+          <div class="each-floor" on-tap="_unveilRoom" room$="[[item]]">
+            <div class$="each-floor-status[[_isVacantRoom(item)]]"></div>
+            [[item]]
+          </div>
+        </template>
       </div>
 
-      <!-- TODO: (Priority: Low) updated info page when on-firebase-value fires. -->
       <div page="info" class="info-page">
         <div class="info-selection">
           <div class="site-selectable floor-selectable" on-tap="_backSite">[[selectedFloorName]]</div>
@@ -75,24 +70,27 @@ Example:
         </div>
         <template is="dom-repeat" items="[[_infoAtSelectedRoom]]" index-as="index" strip-whitespace>
             <div class="each-floor each-info-name">
-              <iron-icon class$="info-status[[_isVacantRoom(item.status)]]" icon="icons:radio-button-[[_isRoomOccupied(item.status)]]"></iron-icon>
+              <iron-icon class$="info-status[[_isVacantRoom(item)]]" icon="icons:radio-button-[[_isRoomOccupied(item)]]"></iron-icon>
 
               <div class="info-title">
                 [[item.name]]
                 <div class="info-locked">
-                  <iron-icon class$="info-lock[[_isRoomLocked(item.locked)]]" icon="icons:lock[[_isRoomLocked(item.locked)]]"></iron-icon>[[_isRoomLockedMsg(item.locked)]]
+                  <iron-icon class$="info-lock[[_isRoomLocked(item.access)]]" icon="icons:lock[[_isRoomLocked(item.access)]]"></iron-icon>[[_isRoomLockedMsg(item.access)]]
                 </div>
               </div>
             </div>
-            <div class="each-info">
-              Person<span>[[item.person]]</span>
-            </div>
-            <div class="each-info">
-              Subject<span>[[item.subject]]</span>
-            </div>
-            <div class="each-info">
-              Time<span>[[item.time]]</span>
-            </div>
+        </template>
+
+        <template is="dom-repeat" items="[[_detailAtSelectedRoom]]" index-as="index" strip-whitespace>
+          <div class="each-info">
+            Person<span>[[item.person]]</span>
+          </div>
+          <div class="each-info">
+            Subject<span>[[item.subject]]</span>
+          </div>
+          <div class="each-info">
+            Time<span>[[item.fromTime]] - [[item.toTime]]</span>
+          </div>
         </template>
       </div>
     </iron-pages>
