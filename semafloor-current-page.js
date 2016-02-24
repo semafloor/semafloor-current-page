@@ -40,12 +40,7 @@ Polymer({
       computed: '_computeFloorsAtSelection(selectedSite, _currentReservations)'
     },
 
-    _currentReservations: {
-      type: Object,
-      value: function() {
-        return {};
-      }
-    },
+    _currentReservations: Array,
     _allSitesData: Object,
 
     _url: {
@@ -75,7 +70,7 @@ Polymer({
         var _week = 'week' + _.padStart(_getWeek(_today), 2, '0');
         var _date = _.padStart(_today.getDate(), 2, '0');
 
-        return [_baseRef, _year, _month, _week, _date, 'reservations'].join('/');
+        return [_baseRef, _year, _month, _week, _date].join('/');
         // TODO: For development purpose...
         // return [_baseRef, _year, _month, 'week07', 17].join('/');
       }
@@ -87,7 +82,7 @@ Polymer({
       value: function() {
         return [];
       },
-      computed: '_computeRoomsAtSelection(selectedSite, selectedFloor, _currentReservations)'
+      computed: '_computeRoomsAtSelection(selectedSite, selectedFloor, _allSitesData)'
     },
     _infoAtSelectedRoom: {
       type: Array,
@@ -145,7 +140,7 @@ Polymer({
   },
 
   _onFirebaseValue: function(ev) {
-    console.log(ev.detail.val());
+    console.log('firebase value: ', ev.detail.val());
     var _firebaseData = ev.detail.val();
     // hide spinner and switch to room page.
     if (this.selectedFloor !== '13level' && this._selectedPage === 'waiting') {
@@ -174,6 +169,8 @@ Polymer({
   _computeFloorStatus: function(_currentReservations, _selectedSite) {
     // X - TODO: Major change as global reservations list now has total different structure.
     if (_.isUndefined(_currentReservations) || _.isEmpty(_currentReservations) || _.isUndefined(_selectedSite)) {
+      // this.set('_floorStatus', {});
+      // this.set('_reservationDetails', {});
       return;
     }
 
@@ -262,7 +259,7 @@ Polymer({
       var _floor = ev.model.item;
       var _selectedSite = ev.model.selectedSite;
 
-      if (_.isEmpty(this._currentReservations) || _.isUndefined(this._currentReservations)) {
+      if (_.isEmpty(this._allSitesData) || _.isUndefined(this._allSitesData)) {
         this.set('_selectedPage', 'waiting');
       }else {
         this.set('_selectedPage', 'room');
@@ -278,9 +275,9 @@ Polymer({
     this.set('_selectedPage', 'floor');
   },
 
-  _computeRoomsAtSelection: function(_selectedSite, _selectedFloor, _currentReservations) {
+  _computeRoomsAtSelection: function(_selectedSite, _selectedFloor, _site) {
     // X - TODO: Major change as global reservations list now has total different structure.
-    if (_.isUndefined(_currentReservations) || _.isEmpty(_currentReservations) || _.isEmpty(_selectedFloor)) {
+    if (_.isUndefined(_site) || _.isEmpty(_site)) {
       return [];
     }
 
@@ -302,7 +299,7 @@ Polymer({
       var _decodedFloor = _alphaFloors[_alphaFloorsCode.indexOf(_selectedFloor)];
       var _temp = this._allSitesData[_decodedSite][_selectedFloor][_selectedItem];
 
-      var _detailAtSelectedRoom = _.isUndefined(this._reservationDetails[_decodedFloor]) ? '' : this._reservationDetails[_decodedFloor][_selectedItem];
+      var _detailAtSelectedRoom = _.isUndefined(this._reservationDetails) || _.isUndefined(this._reservationDetails[_decodedFloor]) ? '' : this._reservationDetails[_decodedFloor][_selectedItem];
       _temp['name'] = _selectedItem;
 
       this.set('_selectedPage', 'info');
@@ -319,6 +316,9 @@ Polymer({
   _isVacantRoom: function(_item) {
     // X - TODO: Minor change due to different structure of global reservations list.
     // ? - TODO: It's quite hard to be of status RESERVED in this system.
+    if (_.isUndefined(_item) || _.isEmpty(_item) || _.isUndefined(this._floorStatus)) {
+      return '';
+    }
 
     var _ff;
     var _fs = this._floorStatus;
@@ -341,10 +341,18 @@ Polymer({
     return _cls;
   },
   _isRoomLocked: function(_locked) {
+    if (_.isUndefined(_locked)) {
+      return '-open';
+    }
+
     return JSON.parse(_locked) ? '-open' : '';
   },
   _isRoomLockedMsg: function(_locked) {
-    return JSON.parse(_locked) ? 'This room is open to the public.' : 'This room has restricted access to the public.';
+    if (_.isUndefined(_locked)) {
+      return 'This room is open to the public.';
+    }
+
+    return _locked ? 'This room is open to the public.' : 'This room has restricted access to the public.';
   },
   _isRoomOccupied: function(_item) {
     // X - TODO: Minor change due to different strucutre in global reservations list.
@@ -352,7 +360,7 @@ Polymer({
     var _fs = this._floorStatus;
     var _isVacantRoom = true;
 
-    if (!_.isUndefined(_fs[_ff])) {
+    if (!_.isUndefined(_fs) && !_.isUndefined(_fs[_ff])) {
       _isVacantRoom = _fs[_ff].indexOf(_item.name) < 0;
     }
 
