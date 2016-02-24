@@ -94,12 +94,21 @@ Polymer({
     _reservationDetails: Object,
     _detailAtSelectedRoom: Array,
 
+    _dialogAnimationDone: {
+      type: Boolean,
+      value: true
+    },
+    _dialogTitle: String,
+    _dialogList: Array,
+    _isDialogInfo: Boolean,
+
   },
 
   observers: [
     '_whenSelectedSiteChanged(selectedSite)',
     '_referenceToUserFirebase(uid)',
-    '_computeFloorStatus(_currentReservations, selectedSite)'
+    '_computeFloorStatus(_currentReservations, selectedSite)',
+    '_openDialog(_dialogAnimationDone)'
   ],
 
   // Element Lifecycle
@@ -371,6 +380,85 @@ Polymer({
   // Nothing shows when switch to other page while the page is loading even it's loaded.
   updateCurrentPages: function() {
     this.$.currentPages.notifyResize();
+  },
+
+  // TODO: Able to show all reservations of a room and room info.
+  _showInfoOrSchedule: function(ev) {
+    var _target = ev.target;
+    console.log(_target.tagName);
+
+    // noop if dialog's still animating.
+    if (!this._dialogAnimationDone) {
+      console.log('dialog animating...');
+      return;
+    }
+
+    // Only when is dialog's animation done, prepare to open new dialog.
+    if (_target && _target.tagName === 'IRON-ICON') {
+      if (_target.hasAttribute('icon')) {
+        var _icon = _target.getAttribute('icon');
+        var _dialogTitle = 'Room Schedule';
+        var _dialogList;
+        var _isDialogInfo = false;
+
+        if (_icon.indexOf('info') > 0) {
+          console.log('info');
+          _dialogTitle = 'Room Information';
+          _dialogList = this._infoAtSelectedRoom;
+          _isDialogInfo = true;
+        }else {
+          console.log('schedule');
+        }
+
+        // Setting up dialog.
+        this.set('_isDialogInfo', _isDialogInfo);
+        this.set('_dialogTitle', _dialogTitle);
+        this.set('_dialogList', _dialogList);
+
+        // Set false to _dialogAnimationDone which will trigger _openDialog method.
+        this.set('_dialogAnimationDone', false);
+        // this.$.infoOrSchedule.open();
+      }
+    }
+  },
+
+  _animationDone: function(ev) {
+    console.log(ev);
+    // When dialog is no longer animating, falsify _dialogAnimationDone.
+    this.set('_dialogAnimationDone', true);
+  },
+
+  _openDialog: function(_dialogAnimationDone) {
+    console.log('open dialog: ', _dialogAnimationDone);
+    // Only when is _dialogAnimationDone falsy dialog is allowed to be opened.
+    if (!_dialogAnimationDone) {
+      // TODO: notifyResize dialog before opening as it acts weirdly in resizing after animation.
+      // TODO: Use rAF instead?
+      this.debounce('resizeDialog', function() {
+        this.$.infoOrSchedule.notifyResize();
+        this.$.infoOrSchedule.open();
+      }, 1);
+    }
+  },
+
+  _isRestricted: function(_access) {
+    // TODO: Since Firebase data has not been updated, no it's undefined.
+    return _access ? 'No' : 'Yes';
+  },
+  _decodeTypes: function(_types) {
+    var _roomTypes = [
+      'Adjoining Room (Operable Wall)','Panaboard','Polycom CX100 (Audio)',
+      'Polycom CX5000 (Video Conferencing)','Projector','Projector Cable Faulty',
+      'Projector Faulty','Screen Projector Faulty','SmartBoard 800','Telepresence',
+      'TV','Writing Glass Board'];
+    var _hexTypes = _.padStart(parseInt(_types, 16).toString(2), 12, 0);
+    var _str2arr = _hexTypes.split('').map(Number);
+    var _filtered = [];
+    _.forEach(_str2arr, function(el, idx) {
+      if (el === 1) _filtered.push(_roomTypes[idx]);
+    });
+    _hexTypes = null; _str2arr = null;
+    return _filtered;
   },
 
 });

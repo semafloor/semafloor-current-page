@@ -4,7 +4,9 @@
 <link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../iron-selector/iron-selector.html">
 
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
 
 <link rel="import" href="../firebase-element/firebase-collection.html">
 <!--
@@ -46,7 +48,6 @@ Example:
       <div page="floor">
         <template is="dom-repeat" items="[[_floorsAtSelectedSite]]" index-as="index" strip-whitespace>
           <div class="each-floor" on-tap="_unveilFloor" floor$="[[item]]">
-            <!-- <div class$="each-floor-status[[_isVacantFloor(_currentReservations, selectedSite, index)]]"></div> -->
             <div class$="each-floor-status[[_isVacantFloor(_floorStatus, selectedSite, item)]]"></div>
             [[item]]
           </div>
@@ -70,12 +71,17 @@ Example:
         </div>
         <template is="dom-repeat" items="[[_infoAtSelectedRoom]]" index-as="index" strip-whitespace>
             <div class="each-floor each-info-name">
-              <iron-icon class$="info-status[[_isVacantRoom(item)]]" icon="icons:radio-button-[[_isRoomOccupied(item)]]"></iron-icon>
+              <div class="each-info-button" on-tap="_showInfoOrSchedule">
+                <iron-icon class$="info-status[[_isVacantRoom(item)]]" icon="icons:radio-button-[[_isRoomOccupied(item)]]"></iron-icon>
+                <iron-icon class="icon-info" icon="icons:info"></iron-icon>
+                <iron-icon class="icon-schedule" icon="icons:query-builder"></iron-icon>
+              </div>
 
               <div class="info-title">
                 [[item.name]]
                 <div class="info-locked">
-                  <iron-icon class$="info-lock[[_isRoomLocked(item.access)]]" icon="icons:lock[[_isRoomLocked(item.access)]]"></iron-icon>[[_isRoomLockedMsg(item.access)]]
+                  <iron-icon class$="info-lock[[_isRoomLocked(item.access)]]" icon="icons:lock[[_isRoomLocked(item.access)]]"></iron-icon>
+                  [[_isRoomLockedMsg(item.access)]]
                 </div>
               </div>
             </div>
@@ -94,6 +100,49 @@ Example:
         </template>
       </div>
     </iron-pages>
+
+    <paper-dialog id="infoOrSchedule"
+      with-backdrop
+      no-auto-focus
+      entry-animation="datepicker-slide-from-bottom-animation"
+      exit-animation="datepicker-slide-from-top-animation"
+      on-neon-animation-finish="_animationDone">
+      <h2>[[_dialogTitle]]</h2>
+      <div class="dialog-list-container">
+        <template is="dom-repeat" items="[[_dialogList]]" index-as="index" strip-whitespace>
+          <template is="dom-if" if="[[_isDialogInfo]]" restamp="true" strip-whitespace>
+            <div class="each-dialog-list">
+              Site
+              <span>[[item.site]]</span>
+            </div>
+            <div class="each-dialog-list">
+              Floor
+              <span>[[item.floor]]</span>
+            </div>
+            <div class="each-dialog-list">
+              Restricted
+              <span>[[_isRestricted(item.access)]]</span>
+            </div>
+            <div class="each-dialog-list">
+              Capacity
+              <span>[[item.capacity]]</span>
+            </div>
+            <div class="each-dialog-list">
+              Types
+              <template is="dom-repeat" items="[[_decodeTypes(item.types)]]" index-as="index" strip-whitespace>
+                <paper-checkbox checked>[[item]]</paper-checkbox>
+              </template>
+            </div>
+          </template>
+
+          <template is="dom-if" if="[[!_isDialogInfo]]" restamp="true" strip-whitespace>
+            <div class="">
+              [[index]]
+            </div>
+          </template>
+        </template>
+      </div>
+    </paper-dialog>
 
   </template>
 </dom-module>

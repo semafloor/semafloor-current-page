@@ -94,7 +94,8 @@
         text-align: right;
         padding: 16px 24px;
         background-color: #ECEFF1;
-        @apply(--layout-justified);
+        align-items: initial;
+        @apply(--layout-vertical);
       }
       div.each-info {
         height: 64px;
@@ -113,8 +114,19 @@
         color: #263238;
         text-transform: capitalize;;
       }
-      iron-icon.info-status {
-        margin: 16px;
+      div.each-info-button {
+        margin-bottom: 8px;
+        @apply(--layout-horizontal);
+      }
+      div.each-info-button > iron-icon.icon-info {
+        margin-left: auto;
+        margin-right: 0;
+        color: #6A7180;
+      }
+      div.each-info-button > iron-icon.icon-schedule {
+        margin-left: 24px;
+        margin-right: 0;
+        color: #6A7180;
       }
       div.info-locked {
         font-size: 11px;
@@ -140,6 +152,40 @@
         display: block;
         margin: 48px auto;
         --paper-spinner-color: #1ddbd8;
+      }
+
+      /* paper-dialog related */
+      div.dialog-list-container {
+        max-height: 520px;
+        @apply(--layout-scroll);
+      }
+      div.each-dialog-list {
+        margin-bottom: 8px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 24px;
+        @apply(--layout-vertical);
+      }
+      div.each-dialog-list > span,
+      div.each-dialog-list > paper-checkbox {
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+        color: #737373;
+      }
+      div.each-dialog-list > paper-checkbox {
+        display: block;
+        margin-bottom: 8px;
+        --paper-checkbox-checked-color: #1ddb8b;
+        --paper-checkbox-unchecked-color: #1ddb8b;
+        --paper-checkbox-checked-ink-color: #1ddb8b;
+        --paper-checkbox-unchecked-ink-color: #1ddb8b;
+        --paper-checkbox-label-color: #737373;
+      }
+      div.each-dialog-list > paper-checkbox:first-of-type {
+        margin-top: 3px;
       }
 
     </style>
