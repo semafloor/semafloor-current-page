@@ -190,6 +190,26 @@
       div.each-dialog-list > paper-checkbox:first-of-type {
         margin-top: 3px;
       }
+      div.each-dialog-time {
+        border-top: 1px solid #ddd;
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        padding-left: 8px;
+        @apply(--layout-horizontal);
+      }
+      div.each-dialog-time:last-of-type {
+        border-bottom: 1px solid #ddd;
+      }
+
+      div.each-dialog-time > span {
+        border-left: 1px solid #ddd;
+        margin-left: 8px;
+        background-color: #1ddb8b;
+        @apply(--layout-flex);
+      }
+      div.each-dialog-time > span.fully-occupied {
+        background-color: #ff1744;
+      }
 
       /* media for landscape mobile */
       @media all and (orientation: landscape) {

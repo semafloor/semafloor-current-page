@@ -385,11 +385,10 @@ Polymer({
   // TODO: Able to show all reservations of a room and room info.
   _showInfoOrSchedule: function(ev) {
     var _target = ev.target;
-    console.log(_target.tagName);
 
     // noop if dialog's still animating.
     if (!this._dialogAnimationDone) {
-      console.log('dialog animating...');
+      // console.log('dialog animating...');
       return;
     }
 
@@ -398,16 +397,33 @@ Polymer({
       if (_target.hasAttribute('icon')) {
         var _icon = _target.getAttribute('icon');
         var _dialogTitle = 'Room Schedule';
-        var _dialogList;
+        var _dialogList = this._infoAtSelectedRoom;
         var _isDialogInfo = false;
 
         if (_icon.indexOf('info') > 0) {
-          console.log('info');
+          // console.log('info');
           _dialogTitle = 'Room Information';
-          _dialogList = this._infoAtSelectedRoom;
           _isDialogInfo = true;
         }else {
-          console.log('schedule');
+          // console.log('schedule');
+          var _hexTypes = _.padStart(parseInt(_dialogList[0].time, 16).toString(2), 32, 0);
+          var _str2arr = _hexTypes.split('').map(Number);
+
+          for (var i = 8, j = 0, k = 0, l =0, _timeArray = []; i < 24; j = j + 30, l++) {
+            if (j === 60) {
+              j = 0;
+              i++;
+            }
+
+            if (i < 24) {
+              k = _.padStart(i, 2, '0') + ':' + _.padStart(j, 2, '0');
+              _timeArray.push({
+                fulltime: k,
+                result: _str2arr[l]
+              });
+            }
+          }
+          _dialogList = _timeArray;
         }
 
         // Setting up dialog.
@@ -432,21 +448,25 @@ Polymer({
   // HOWEVER, delay is certainly there for all of these to happen during user interaction.
   _dialogClosedDone: function(ev) {
     if (!this._dialogAnimationDone) {
-      console.warn('dialog is ready to be opened!');
+      console.warn('Subsequent dialog is now ready to be opened!');
+      // Bring back document scrolling.
+      document.body.style.overflow = '';
       this.set('_dialogAnimationDone', true);
     }
   },
 
   _openDialog: function(_dialogAnimationDone) {
-    console.log('open dialog: ', _dialogAnimationDone);
+    // console.log('open dialog: ', _dialogAnimationDone, this._dialogList);
     // Only when is _dialogAnimationDone falsy dialog is allowed to be opened.
     if (!_dialogAnimationDone) {
       // TODO: notifyResize dialog before opening as it acts weirdly in resizing after animation.
       // TODO: Use rAF instead?
-      console.log('resizing dialog...');
+      // console.log('resizing dialog...');
       this.$.infoOrSchedule.notifyResize();
+      // Disable document scrolling.
+      document.body.style.overflow = 'hidden';
       this.debounce('resizeDialog', function() {
-        console.log('opening dialog...');
+        // console.log('opening dialog...');
         this.$.infoOrSchedule.open();
       }, 1);
     }
@@ -470,6 +490,10 @@ Polymer({
     });
     _hexTypes = null; _str2arr = null;
     return _filtered;
+  },
+
+  _isVacantTime: function(_result) {
+    return !_result ? '' : ' fully-occupied';
   },
 
 });
