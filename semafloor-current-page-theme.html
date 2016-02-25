@@ -155,8 +155,11 @@
       }
 
       /* paper-dialog related */
+      paper-dialog {
+        box-shadow: none;
+      }
       div.dialog-list-container {
-        max-height: 520px;
+        max-height: calc(520px - 28px - 24px - 20px - 24px);
         @apply(--layout-scroll);
       }
       div.each-dialog-list {
@@ -186,6 +189,13 @@
       }
       div.each-dialog-list > paper-checkbox:first-of-type {
         margin-top: 3px;
+      }
+
+      /* media for landscape mobile */
+      @media all and (orientation: landscape) {
+        div.dialog-list-container {
+          max-height: calc(272px - 28px - 24px - 20px - 24px);
+        }
       }
 
     </style>

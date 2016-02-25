@@ -422,10 +422,19 @@ Polymer({
     }
   },
 
-  _animationDone: function(ev) {
-    console.log(ev);
-    // When dialog is no longer animating, falsify _dialogAnimationDone.
-    this.set('_dialogAnimationDone', true);
+  // TODO: Even though neon-animation-finish fires off, the iron-overlay-closed is not yet fired.
+  // In this case, when animation is done and the dialog is still opened, the subsequent dialog
+  // will distort in its appearance during animation and/ or affect its resizing during/ after
+  // animation.
+  // In order to tackle this issue, the dialog must be closed after animation is done.
+  // MUST always ensure that both neon-animation-finish and iron-overlay-closed are fired!
+  // To make things simple, listen for iron-overlay-closed is more than enough.
+  // HOWEVER, delay is certainly there for all of these to happen during user interaction.
+  _dialogClosedDone: function(ev) {
+    if (!this._dialogAnimationDone) {
+      console.warn('dialog is ready to be opened!');
+      this.set('_dialogAnimationDone', true);
+    }
   },
 
   _openDialog: function(_dialogAnimationDone) {
@@ -434,8 +443,10 @@ Polymer({
     if (!_dialogAnimationDone) {
       // TODO: notifyResize dialog before opening as it acts weirdly in resizing after animation.
       // TODO: Use rAF instead?
+      console.log('resizing dialog...');
+      this.$.infoOrSchedule.notifyResize();
       this.debounce('resizeDialog', function() {
-        this.$.infoOrSchedule.notifyResize();
+        console.log('opening dialog...');
         this.$.infoOrSchedule.open();
       }, 1);
     }
