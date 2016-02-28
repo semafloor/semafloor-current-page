@@ -113,7 +113,8 @@ Polymer({
     '_referenceToUserFirebase(uid)',
     '_computeFloorStatus(_currentReservations, selectedSite)',
     '_openDialog(_dialogAnimationDone)',
-    '_veryLargeDesktopChanged(_veryLargeDesktop)'
+    '_veryLargeDesktopChanged(_veryLargeDesktop)',
+    '_isMobilePortraitChanged(_isMobilePortrait)'
   ],
 
   // Element Lifecycle
@@ -574,6 +575,18 @@ Polymer({
   _veryLargeDesktopChanged: function(_veryLargeDesktop) {
     var _withBackdrop = !_veryLargeDesktop;
     this.$.infoOrSchedule.withBackdrop = _withBackdrop;
+  },
+  // To update div.dialog-list-container-max-height using customProp with media query changes.
+  _isMobilePortraitChanged: function(_isMobilePortrait) {
+    this.async(function() {
+      var _dialog = this.$.infoOrSchedule;
+      var _dialogMaxHeight = _dialog.style.maxHeight;
+      var _newMaxHeight = parseInt(_dialogMaxHeight) - 28 - 24 - 20 - 24;
+
+      this.customStyle['--dialog-list-container-max-height'] = _newMaxHeight + 'px';
+      this.updateStyles();
+      _dialog.notifyResize();
+    }, 1);
   },
 
   // TODO: New weekend page needs more styling.

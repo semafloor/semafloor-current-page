@@ -30,6 +30,7 @@ Example:
     <style include="semafloor-current-page-theme"></style>
 
     <iron-media-query query="min-width: 801px" query-matches="{{_veryLargeDesktop}}"></iron-media-query>
+    <iron-media-query query="orientation: portrait" query-matches="{{_isMobilePortrait}}"></iron-media-query>
 
     <firebase-collection id="listAjax"
       location="[[_url]]" on-firebase-value="_onFirebaseValue">
@@ -152,14 +153,14 @@ Example:
         </template>
 
         <template is="dom-if" if="[[!_isDialogInfo]]" strip-whitespace>
-          <div class="">
-            <template is="dom-repeat" items="[[_dialogList]]" index-as="index" strip-whitespace>
-              <div class="each-dialog-time">
-                [[item.fulltime]]
-                <span class$="[[_isVacantTime(item.result)]]"></span>
-              </div>
-            </template>
-          </div>
+          <template is="dom-repeat" items="[[_dialogList]]" index-as="index" strip-whitespace>
+            <div class="each-dialog-time">
+              [[item.fulltime]]
+              <span class$="[[_isVacantTime(item.result)]]"></span>
+            </div>
+          </template>
+          <!-- <div class="">
+          </div> -->
         </template>
       </div>
     </paper-dialog>
