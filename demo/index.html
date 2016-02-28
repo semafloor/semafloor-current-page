@@ -26,20 +26,19 @@
       }
 
       app-header {
-        background-color: #009688;
-        color: #fff;
+        color: #009688;
+        background-color: #fff;
       }
 
       [title] {
-        color: #fff;
         font-size: 20px;
-        font-weight: 300;
+        font-weight: 400;
         margin-left: 8px;
       }
     </style>
   </head>
   <body>
-    <app-drawer-layout>
+    <app-drawer-layout force-narrow>
       <app-drawer swipe-open></app-drawer>
 
       <app-header-layout>
@@ -69,8 +68,16 @@
     </app-drawer-layout>
 
     <script>
-      var seedElement = document.querySelector('semafloor-current-page');
-      console.log('semafloor-current-index');
+      var _app = document.querySelector('semafloor-current-page');
+
+      _app.addEventListener('current-page-attached', function() {
+        console.log('Total element nodes: ', _app.getElementsByTagName('*').length);
+      });
+      // HTMLImports.whenReady(function() {
+      //   window.setTimeout(function() {
+      //     console.log('Total element nodes: ', _app.getElementsByTagName('*').length);
+      //   });
+      // });
     </script>
 
   </body>

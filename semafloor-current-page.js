@@ -37,7 +37,7 @@ Polymer({
       value: function() {
         return _alphaFloors;
       },
-      computed: '_computeFloorsAtSelection(selectedSite, _currentReservations)'
+      computed: '_computeFloorsAtSelection(selectedSite)'
     },
 
     _currentReservations: Array,
@@ -102,13 +102,18 @@ Polymer({
     _dialogList: Array,
     _isDialogInfo: Boolean,
 
+    _isWeekend: Boolean,
+    _veryLargeDesktop: Boolean,
+    _newBackgroundImage: String,
+
   },
 
   observers: [
     '_whenSelectedSiteChanged(selectedSite)',
     '_referenceToUserFirebase(uid)',
     '_computeFloorStatus(_currentReservations, selectedSite)',
-    '_openDialog(_dialogAnimationDone)'
+    '_openDialog(_dialogAnimationDone)',
+    '_veryLargeDesktopChanged(_veryLargeDesktop)'
   ],
 
   // Element Lifecycle
@@ -135,6 +140,17 @@ Polymer({
     // This is a good place to perform any work related to your element's
     // visual state or active behavior (measuring sizes, beginning animations,
     // loading resources, etc).
+    var _clientWidth = this.clientWidth;
+    if (_clientWidth > 800) {
+
+      // TODO: If screen larger than 1200, allows 2 dialogs to show on screen at the same time.
+      // if (_clientWidth >= 1200) {
+      //   this.$.infoOrSchedule.noCancelOnOutsideClick = !0;
+      // }
+      this.set('_veryLargeDesktop', !0);
+      this._changeNewBackgroundImage();
+      this.$.infoOrSchedule.withBackdrop = !1;
+    }
 
     // TODO: load external resources, eg. Firebase.
     this.fire('current-page-attached');
@@ -151,6 +167,20 @@ Polymer({
   _onFirebaseValue: function(ev) {
     console.log('firebase value: ', ev.detail.val());
     var _firebaseData = ev.detail.val();
+
+    // Probably today is weekend, yet you're checking for reservations.
+    if (_.isEmpty(_firebaseData.site)) {
+      this.set('_isWeekend', !0);
+      // Observer won't work if one of the dependencies is undefined.
+      this.set('_allSitesData', {});
+      this.set('_currentReservations', []);
+
+      if (this._selectedPage === 'waiting') {
+        this.set('_selectedPage', 'weekend');
+      }
+      return;
+    }
+
     // hide spinner and switch to room page.
     if (this.selectedFloor !== '13level' && this._selectedPage === 'waiting') {
       this.set('_selectedPage', 'room');
@@ -159,6 +189,7 @@ Polymer({
     // fire an event when data is fetched.
     this.fire('current-reservations-ready');
 
+    // TODO: What if today happens to be one of the weekends?
     // Set _allSitesData first before _currentReservations.
     this.set('_allSitesData', _firebaseData.site);
     this.set('_currentReservations', _.sortBy(_.pickBy(_firebaseData.reservations, function(_value, _key) { return _key.length > 4; }), ['fromTime']));
@@ -167,9 +198,13 @@ Polymer({
   },
 
   _computeFloorsAtSelection: function(_selectedSite) {
-    return [_alphaFloors, ['level 3'], ['level 1']][_siteNames.indexOf(_selectedSite)];
+    var _idx = _siteNames.indexOf(_selectedSite);
+    var _floors = [_alphaFloors, ['level 3'], ['level 1']][_idx];
+    return _floors;
   },
   _whenSelectedSiteChanged: function(_selectedSite) {
+    // Now change to new background image on each site value changes.
+    this._changeNewBackgroundImage();
     // go back to floor page when select on another site at floor page.
     if (this._selectedPage !== 'floor') {
       this.set('_selectedPage', 'floor');
@@ -261,6 +296,13 @@ Polymer({
     }
   },
   _unveilFloor: function(ev) {
+    // Nothing to show on weekends.
+    if (this._isWeekend) {
+      console.log('unveil floor');
+      this.set('_selectedPage', 'weekend');
+      return;
+    }
+
     // X - TODO: Minor change as global reservations list now has total different structure.
     var _target = ev.target;
 
@@ -496,4 +538,45 @@ Polymer({
     return !_result ? '' : ' fully-occupied';
   },
 
+  // customProperties FTW! Recompute CSS maxHeight for div.dialog-list-container
+  // right after the dialog is opened!
+  _overflowContent: function(ev) {
+    var _target = ev.target;
+    var _dialogMaxHeight = _target.style.maxHeight;
+    var _newMaxHeight = parseInt(_dialogMaxHeight) - 28 - 24 - 20 - 24;
+    this.customStyle['--dialog-list-container-max-height'] = _newMaxHeight + 'px';
+    this.updateStyles();
+  },
+  // Change new background image for the page.
+  _changeNewBackgroundImage: function() {
+    var _backgroundImages = [
+      'https://wallpaperscraft.com/image/mountain_building_hill_cliff_100487_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/trees_sunset_sky_river_winter_92676_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/mountains_grass_tops_sky_92475_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/nature_mountains_sky_lake_clouds_81150_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/mountains_sky_sunset_peaks_97149_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/full_moon_stars_clouds_shadows_45767_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/stars_sky_shore_84534_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/mountains_sea_ocean_clouds_night_96938_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/night_stars_alps_87097_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/dusk_evening_lights_home_castle_mountains_alps_christmas_slovenia_59568_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/switzerland_city_evening_alps_mountains_fog_95963_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/sunset_sea_wave_87145_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/hamburg_germany_speicherstadt_warehouse_evening_building_63117_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/decline_sea_coast_beach_mountains_sun_evening_clouds_calm_14556_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/mountains_houses_snow_winter_beautiful_92511_2560x1440.jpg',
+      'https://wallpaperscraft.com/image/coast_sea_decline_branch_palm_tree_sand_beach_panorama_evening_orange_46137_2560x1440.jpg'
+    ];
+    var _backgroundImagesLen = _backgroundImages.length;
+    var _randomIdx = Math.ceil(Math.random() * _backgroundImagesLen) - 1;
+    this._newBackgroundImage = _backgroundImages[_randomIdx];
+  },
+  _veryLargeDesktopChanged: function(_veryLargeDesktop) {
+    var _withBackdrop = !_veryLargeDesktop;
+    this.$.infoOrSchedule.withBackdrop = _withBackdrop;
+  },
+
+  // TODO: New weekend page needs more styling.
+  // TODO: Spinner needs more styling...
+  // X - TODO: Remove _currentReservations dependcy from _computeFloorsAtSelection as this is not needed.
 });

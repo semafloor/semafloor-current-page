@@ -4,6 +4,8 @@
 <!-- <link rel="import" href="../iron-icon/iron-icon.html"> -->
 <link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../iron-selector/iron-selector.html">
+<link rel="import" href="../iron-image/iron-image.html">
+<link rel="import" href="../iron-media-query/iron-media-query.html">
 
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-spinner/paper-spinner-lite.html">
@@ -27,9 +29,15 @@ Example:
   <template strip-whitespace>
     <style include="semafloor-current-page-theme"></style>
 
+    <iron-media-query query="min-width: 801px" query-matches="{{_veryLargeDesktop}}"></iron-media-query>
+
     <firebase-collection id="listAjax"
       location="[[_url]]" on-firebase-value="_onFirebaseValue">
     </firebase-collection>
+
+    <template is="dom-if" if="[[_veryLargeDesktop]]" restamp="true" strip-whitespace>
+      <iron-image src="[[_newBackgroundImage]]" preload fade sizing="cover"></iron-image>
+    </template>
 
     <iron-selector selected="{{selectedSite}}" attr-for-selected="site">
       <div class="site-selectable" site="KLB - Tower 5">
@@ -46,7 +54,11 @@ Example:
     <iron-pages id="currentPages" selected="[[_selectedPage]]" attr-for-selected="page">
       <paper-spinner-lite page="waiting" active></paper-spinner-lite>
 
-      <div page="floor">
+      <div class="weekend-page" page="weekend">
+        Hurrah! You don't have any reservations on weekends!
+      </div>
+
+      <div page="floor" class="floor-page">
         <template is="dom-repeat" items="[[_floorsAtSelectedSite]]" index-as="index" strip-whitespace>
           <div class="each-floor" on-tap="_unveilFloor" floor$="[[item]]">
             <div class$="each-floor-status[[_isVacantFloor(_floorStatus, selectedSite, item)]]"></div>
@@ -108,6 +120,7 @@ Example:
       no-auto-focus
       entry-animation="datepicker-slide-from-bottom-animation"
       exit-animation="datepicker-slide-from-top-animation"
+      on-iron-overlay-opened="_overflowContent"
       on-iron-overlay-closed="_dialogClosedDone">
       <h2>[[_dialogTitle]]</h2>
       <div class="dialog-list-container">
