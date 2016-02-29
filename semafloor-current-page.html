@@ -52,11 +52,13 @@ Example:
       </div>
     </iron-selector>
 
-    <iron-pages id="currentPages" selected="[[_selectedPage]]" attr-for-selected="page">
+    <div id="loadingSpinner" class="waiting-page" page='waiting'>
       <paper-spinner-lite page="waiting" active></paper-spinner-lite>
+    </div>
 
+    <iron-pages id="currentPages" selected="[[_selectedPage]]" attr-for-selected="page">
       <div class="weekend-page" page="weekend">
-        Hurrah! You don't have any reservations on weekends!
+        Hurrah! No reservations on weekends!
       </div>
 
       <div page="floor" class="floor-page">

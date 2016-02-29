@@ -18,10 +18,8 @@
 
       /* site-selectable */
       iron-selector {
-        /*border-bottom: 1px solid #ddd;*/
         padding: 8px;
         margin-bottom: 8px;
-        /*margin: 0 auto 8px;*/
         @apply(--layout-horizontal);
       }
       div.site-selectable {
@@ -44,7 +42,41 @@
         color: #eee;
       }
 
-      /*iron-pages {}*/
+      div.waiting-page {
+        position: fixed;
+        background-color: #fff;
+        width: 44px;
+        height: 44px;
+        padding: 8px;
+        border-radius: 50%;
+        left: calc(50% - 22px);
+        top: 25%;
+        pointer-events: none;
+        box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                    0 3px 14px 2px rgba(0, 0, 0, 0.12),
+                    0 5px 5px -3px rgba(0, 0, 0, 0.4);
+
+        opacity: 0;
+        transition: opacity ease-in .4s;
+        -webkit-transition: opacity ease-in .4s;
+      }
+      paper-spinner-lite {
+        --paper-spinner-color: #1ddbd8;
+      }
+
+      div.weekend-page {
+        color: #bdbdbd;
+        font-weight: 700;
+        font-size: 20px;
+        text-align: center;
+        padding: 24px 16px 0;
+      }
+
+      iron-pages {
+        opacity: 1;
+        transition: opacity ease-in .2s;
+        -webkit-transition: opacity ease-in .2s;
+      }
       div.each-floor-status {
         position: absolute;
         left: 8px;
@@ -151,12 +183,6 @@
         color: #BCAAA4;
       }
 
-      paper-spinner-lite {
-        display: block;
-        margin: 48px auto;
-        --paper-spinner-color: #1ddbd8;
-      }
-
       /* paper-dialog related */
       paper-dialog {
         box-shadow: none;
@@ -254,6 +280,13 @@
         iron-pages {
           height: 100%;
         }
+        div.waiting-page {
+          top: 16%;
+        }
+        paper-spinner-lite {
+          margin: 0;
+        }
+        div.weekend-page,
         div.floor-page,
         div.room-page,
         div.info-page {
@@ -266,6 +299,9 @@
           margin-top: calc(64px + 24px);
           margin-bottom: 8px;
           width: 376px;
+
+          overflow: auto;
+          max-height: calc(100% - 64px - 88px - 8px);
         }
         div.site-selectable.floor-selectable {
           margin-top: 8px;

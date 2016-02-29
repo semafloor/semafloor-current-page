@@ -28,10 +28,7 @@ Polymer({
       value: 'El Psy Kongroo'
     },
 
-    _selectedPage: {
-      type: String,
-      value: 'waiting'
-    },
+    _selectedPage: String,
     _floorsAtSelectedSite: {
       type: Array,
       value: function() {
@@ -105,6 +102,7 @@ Polymer({
     _isWeekend: Boolean,
     _veryLargeDesktop: Boolean,
     _newBackgroundImage: String,
+    _isLoading: Boolean,
 
   },
 
@@ -113,15 +111,12 @@ Polymer({
     '_referenceToUserFirebase(uid)',
     '_computeFloorStatus(_currentReservations, selectedSite)',
     '_openDialog(_dialogAnimationDone)',
-    '_veryLargeDesktopChanged(_veryLargeDesktop)',
-    '_isMobilePortraitChanged(_isMobilePortrait)'
+    '_isMobilePortraitChanged(_isMobilePortrait)',
+    '_transitionSpinner(_isLoading)'
   ],
 
   // Element Lifecycle
   created: function() {
-    // console.log('semafloor-current-created');
-    // console.time('semafloor-current-ready');
-    // console.time('semafloor-current-attached');
   },
 
   ready: function() {
@@ -150,7 +145,6 @@ Polymer({
       // }
       this.set('_veryLargeDesktop', !0);
       this._changeNewBackgroundImage();
-      this.$.infoOrSchedule.withBackdrop = !1;
     }
 
     // TODO: load external resources, eg. Firebase.
@@ -176,14 +170,16 @@ Polymer({
       this.set('_allSitesData', {});
       this.set('_currentReservations', []);
 
-      if (this._selectedPage === 'waiting') {
+      if (this._isLoading) {
+        this.set('_isLoading', !1);
         this.set('_selectedPage', 'weekend');
       }
       return;
     }
 
     // hide spinner and switch to room page.
-    if (this.selectedFloor !== '13level' && this._selectedPage === 'waiting') {
+    if (this.selectedFloor !== '13level' && this._isLoading) {
+      this.set('_isLoading', !1);
       this.set('_selectedPage', 'room');
     }
 
@@ -299,7 +295,6 @@ Polymer({
   _unveilFloor: function(ev) {
     // Nothing to show on weekends.
     if (this._isWeekend) {
-      console.log('unveil floor');
       this.set('_selectedPage', 'weekend');
       return;
     }
@@ -312,7 +307,7 @@ Polymer({
       var _selectedSite = ev.model.selectedSite;
 
       if (_.isEmpty(this._allSitesData) || _.isUndefined(this._allSitesData)) {
-        this.set('_selectedPage', 'waiting');
+        this.set('_isLoading', !0);
       }else {
         this.set('_selectedPage', 'room');
       }
@@ -431,7 +426,6 @@ Polymer({
 
     // noop if dialog's still animating.
     if (!this._dialogAnimationDone) {
-      // console.log('dialog animating...');
       return;
     }
 
@@ -444,11 +438,9 @@ Polymer({
         var _isDialogInfo = false;
 
         if (_icon.indexOf('info') > 0) {
-          // console.log('info');
           _dialogTitle = 'Room Information';
           _isDialogInfo = true;
         }else {
-          // console.log('schedule');
           var _hexTypes = _.padStart(parseInt(_dialogList[0].time, 16).toString(2), 32, 0);
           var _str2arr = _hexTypes.split('').map(Number);
 
@@ -499,17 +491,12 @@ Polymer({
   },
 
   _openDialog: function(_dialogAnimationDone) {
-    // console.log('open dialog: ', _dialogAnimationDone, this._dialogList);
     // Only when is _dialogAnimationDone falsy dialog is allowed to be opened.
     if (!_dialogAnimationDone) {
-      // TODO: notifyResize dialog before opening as it acts weirdly in resizing after animation.
-      // TODO: Use rAF instead?
-      // console.log('resizing dialog...');
       this.$.infoOrSchedule.notifyResize();
       // Disable document scrolling.
       document.body.style.overflow = 'hidden';
       this.debounce('resizeDialog', function() {
-        // console.log('opening dialog...');
         this.$.infoOrSchedule.open();
       }, 1);
     }
@@ -572,10 +559,6 @@ Polymer({
     var _randomIdx = Math.ceil(Math.random() * _backgroundImagesLen) - 1;
     this._newBackgroundImage = _backgroundImages[_randomIdx];
   },
-  _veryLargeDesktopChanged: function(_veryLargeDesktop) {
-    var _withBackdrop = !_veryLargeDesktop;
-    this.$.infoOrSchedule.withBackdrop = _withBackdrop;
-  },
   // To update div.dialog-list-container-max-height using customProp with media query changes.
   _isMobilePortraitChanged: function(_isMobilePortrait) {
     this.async(function() {
@@ -588,8 +571,17 @@ Polymer({
       _dialog.notifyResize();
     }, 1);
   },
+  _transitionSpinner: function(_isLoading) {
+    var _isOpaque = _isLoading ? 1 : 0;
+    // Transition opacity of paper-spinnner corresponding to _isLoading's state.
+    this.$.loadingSpinner.style.opacity = _isOpaque;
+    // Hide iron-pages when spinner is showing and vice versa.
+    this.$.currentPages.style.opacity = +!_isOpaque;
+  },
 
-  // TODO: New weekend page needs more styling.
-  // TODO: Spinner needs more styling...
+  // TODO: Add social:mood to weekend page.
+  // X - TODO: New weekend page needs more styling.
+  // X - TODO: Spinner needs more styling...
+  // X - TODO: Overflow content of div.floor, div.room, div.info.
   // X - TODO: Remove _currentReservations dependcy from _computeFloorsAtSelection as this is not needed.
 });
