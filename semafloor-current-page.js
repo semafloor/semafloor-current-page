@@ -104,6 +104,11 @@ Polymer({
     _newBackgroundImage: String,
     _isLoading: Boolean,
 
+    _isWeekendPageOpened: Boolean,
+    _isRoomPageOpened: Boolean,
+    _isInfoPageOpened: Boolean,
+    _isInfoOrScheduleOpened: Boolean,
+
   },
 
   observers: [
@@ -172,7 +177,11 @@ Polymer({
 
       if (this._isLoading) {
         this.set('_isLoading', !1);
-        this.set('_selectedPage', 'weekend');
+        // this.set('_isWeekendPageOpened', !0);
+        // this.async(function() {
+        //   this.set('_selectedPage', 'weekend');
+        // }, 1);
+        this._lazifySelectedPage('_isWeekendPageOpened', 'weekend');
       }
       return;
     }
@@ -180,7 +189,11 @@ Polymer({
     // hide spinner and switch to room page.
     if (this.selectedFloor !== '13level' && this._isLoading) {
       this.set('_isLoading', !1);
-      this.set('_selectedPage', 'room');
+      // this.set('_isRoomPageOpened', !0);
+      // this.async(function() {
+      //   this.set('_selectedPage', 'room');
+      // }, 1);
+      this._lazifySelectedPage('_isRoomPageOpened', 'room');
     }
 
     // fire an event when data is fetched.
@@ -204,7 +217,11 @@ Polymer({
     this._changeNewBackgroundImage();
     // go back to floor page when select on another site at floor page.
     if (this._selectedPage !== 'floor') {
-      this.set('_selectedPage', 'floor');
+      // this.set('_isFloorPageOpened', !0);
+      // this.async(function() {
+      //   this.set('_selectedPage', 'floor');
+      // }, 1);
+      this._lazifySelectedPage('_isFloorPageOpened', 'floor');
     }
   },
   _computeFloorStatus: function(_currentReservations, _selectedSite) {
@@ -295,7 +312,15 @@ Polymer({
   _unveilFloor: function(ev) {
     // Nothing to show on weekends.
     if (this._isWeekend) {
-      this.set('_selectedPage', 'weekend');
+      // if (!this._isWeekendPageOpened) {
+      //   this.set('_isWeekendPageOpened', !0);
+      //   this.async(function() {
+      //     this.set('_selectedPage', 'weekend');
+      //   }, 1);
+      // }else {
+      //   this.set('_selectedPage', 'weekend');
+      // }
+      this._lazifySelectedPage('_isWeekendPageOpened', 'weekend');
       return;
     }
 
@@ -309,7 +334,15 @@ Polymer({
       if (_.isEmpty(this._allSitesData) || _.isUndefined(this._allSitesData)) {
         this.set('_isLoading', !0);
       }else {
-        this.set('_selectedPage', 'room');
+        // if (!this._isRoomPageOpened) {
+        //   this.set('_isRoomPageOpened', !0);
+        //   this.async(function() {
+        //     this.set('_selectedPage', 'room');
+        //   }, 1);
+        // }else {
+        //   this.set('_selectedPage', 'room');
+        // }
+        this._lazifySelectedPage('_isRoomPageOpened', 'room');
       }
 
       this.set('selectedFloor', _floor === 'level 3A' ? '04level' : _alphaFloorsCode[_alphaFloors.indexOf(_floor)]);
@@ -319,7 +352,15 @@ Polymer({
   _backSite: function() {
     this.set('selectedFloor', null);
     this.set('selectedFloorName', null);
-    this.set('_selectedPage', 'floor');
+    // if (!this._isFloorPageOpened) {
+    //   this.set('_isFloorPageOpened', !0);
+    //   this.async(function() {
+    //     this.set('_selectedPage', 'floor');
+    //   }, 1);
+    // }else {
+    //   this.set('_selectedPage', 'floor');
+    // }
+    this._lazifySelectedPage('_isFloorPageOpened', 'floor');
   },
 
   _computeRoomsAtSelection: function(_selectedSite, _selectedFloor, _site) {
@@ -349,7 +390,14 @@ Polymer({
       var _detailAtSelectedRoom = _.isUndefined(this._reservationDetails) || _.isUndefined(this._reservationDetails[_decodedFloor]) ? '' : this._reservationDetails[_decodedFloor][_selectedItem];
       _temp['name'] = _selectedItem;
 
-      this.set('_selectedPage', 'info');
+      // if (!this._isInfoPageOpened) {
+      //   this.set('_isInfoPageOpened', !0);
+      //   this.async(function() {
+      //
+      //   }, 1);
+      // }
+      // this.set('_selectedPage', 'info');
+      this._lazifySelectedPage('_isInfoPageOpened', 'info');
 
       this.set('_detailAtSelectedRoom', [_detailAtSelectedRoom]);
       this.set('selectedRoomName', _selectedItem);
@@ -358,7 +406,8 @@ Polymer({
   },
   _backRoom: function() {
     this.set('selectedRoomName', null);
-    this.set('_selectedPage', 'room');
+    // this.set('_selectedPage', 'room');
+    this._lazifySelectedPage('_isRoomPageOpened', 'room');
   },
   _isVacantRoom: function(_item) {
     // X - TODO: Minor change due to different structure of global reservations list.
@@ -493,12 +542,22 @@ Polymer({
   _openDialog: function(_dialogAnimationDone) {
     // Only when is _dialogAnimationDone falsy dialog is allowed to be opened.
     if (!_dialogAnimationDone) {
-      this.$.infoOrSchedule.notifyResize();
       // Disable document scrolling.
       document.body.style.overflow = 'hidden';
-      this.debounce('resizeDialog', function() {
-        this.$.infoOrSchedule.open();
-      }, 1);
+      // this.$.infoOrSchedule.notifyResize();
+      // if (!this._isInfoOrScheduleOpened) {
+      //   this.set('_isInfoOrScheduleOpened', !0);
+      // }
+
+      this._lazifyDialog('_isInfoOrScheduleOpened', function() {
+        var _dialog = this.$$('#infoOrSchedule');
+        _dialog.notifyResize();
+        this.async(function() {
+          _dialog.open();
+        }, 1);
+      });
+      // this.debounce('resizeDialog', function() {
+      // }, 1);
     }
   },
 
@@ -559,18 +618,7 @@ Polymer({
     var _randomIdx = Math.ceil(Math.random() * _backgroundImagesLen) - 1;
     this._newBackgroundImage = _backgroundImages[_randomIdx];
   },
-  // To update div.dialog-list-container-max-height using customProp with media query changes.
-  _isMobilePortraitChanged: function(_isMobilePortrait) {
-    this.async(function() {
-      var _dialog = this.$.infoOrSchedule;
-      var _dialogMaxHeight = _dialog.style.maxHeight;
-      var _newMaxHeight = parseInt(_dialogMaxHeight) - 28 - 24 - 20 - 24;
 
-      this.customStyle['--dialog-list-container-max-height'] = _newMaxHeight + 'px';
-      this.updateStyles();
-      _dialog.notifyResize();
-    }, 1);
-  },
   _transitionSpinner: function(_isLoading) {
     var _isOpaque = _isLoading ? 1 : 0;
     // Transition opacity of paper-spinnner corresponding to _isLoading's state.
@@ -579,7 +627,34 @@ Polymer({
     this.$.currentPages.style.opacity = +!_isOpaque;
   },
 
+  // Lazily load and open the selected page.
+  _lazifySelectedPage: function(_isWhichPageOpened, _page) {
+    if (!this[_isWhichPageOpened]) {
+      this.set(_isWhichPageOpened, !0);
+      // Is this necessary? JIC loading is still running.
+      this.async(function() {
+        this.set('_selectedPage', _page);
+      }, 1);
+    }else {
+      this.set('_selectedPage', _page);
+    }
+  },
+  // Lazily load and open dialog.
+  _lazifyDialog: function(_isWhichDialogOpened, _cb) {
+    var _thisCb = _cb.bind(this);
+    if (!this[_isWhichDialogOpened]) {
+      this.set(_isWhichDialogOpened, !0);
+      this.async(function() {
+        _thisCb();
+      }, 1);
+    }else {
+      _thisCb();
+    }
+  },
+
   // TODO: Add social:mood to weekend page.
+  // X - TODO: Styling in between 360P mobile and 800P desktop.
+  // X - TODO: Lazify non-critical elements.
   // X - TODO: New weekend page needs more styling.
   // X - TODO: Spinner needs more styling...
   // X - TODO: Overflow content of div.floor, div.room, div.info.
