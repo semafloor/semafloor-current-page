@@ -1,12 +1,11 @@
 {
   "name": "semafloor-current-page",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "authors": [
     "semafloor <wes_ngrongsen@hotmail.com>"
   ],
   "description": "Semafloor's Current Reservations Page.",
   "keywords": [
-    "web-component",
     "polymer",
     "seed",
     "semafloor"
@@ -28,7 +27,8 @@
     "neon-animation": "PolymerElements/neon-animation#^1.1.0",
     "paper-checkbox": "PolymerElements/paper-checkbox#^1.1.3",
     "iron-image": "PolymerElements/iron-image#^1.2.2",
-    "iron-media-query": "PolymerElements/iron-media-query#^1.0.8"
+    "iron-media-query": "PolymerElements/iron-media-query#^1.0.8",
+    "paper-dialog-scrollable": "polymerelements/paper-dialog-scrollable#^1.1.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

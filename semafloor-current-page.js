@@ -108,6 +108,7 @@ Polymer({
     _isRoomPageOpened: Boolean,
     _isInfoPageOpened: Boolean,
     _isInfoOrScheduleOpened: Boolean,
+    _isSpinnerOpened: Boolean,
 
   },
 
@@ -177,10 +178,6 @@ Polymer({
 
       if (this._isLoading) {
         this.set('_isLoading', !1);
-        // this.set('_isWeekendPageOpened', !0);
-        // this.async(function() {
-        //   this.set('_selectedPage', 'weekend');
-        // }, 1);
         this._lazifySelectedPage('_isWeekendPageOpened', 'weekend');
       }
       return;
@@ -189,10 +186,7 @@ Polymer({
     // hide spinner and switch to room page.
     if (this.selectedFloor !== '13level' && this._isLoading) {
       this.set('_isLoading', !1);
-      // this.set('_isRoomPageOpened', !0);
-      // this.async(function() {
-      //   this.set('_selectedPage', 'room');
-      // }, 1);
+
       this._lazifySelectedPage('_isRoomPageOpened', 'room');
     }
 
@@ -217,10 +211,6 @@ Polymer({
     this._changeNewBackgroundImage();
     // go back to floor page when select on another site at floor page.
     if (this._selectedPage !== 'floor') {
-      // this.set('_isFloorPageOpened', !0);
-      // this.async(function() {
-      //   this.set('_selectedPage', 'floor');
-      // }, 1);
       this._lazifySelectedPage('_isFloorPageOpened', 'floor');
     }
   },
@@ -312,14 +302,6 @@ Polymer({
   _unveilFloor: function(ev) {
     // Nothing to show on weekends.
     if (this._isWeekend) {
-      // if (!this._isWeekendPageOpened) {
-      //   this.set('_isWeekendPageOpened', !0);
-      //   this.async(function() {
-      //     this.set('_selectedPage', 'weekend');
-      //   }, 1);
-      // }else {
-      //   this.set('_selectedPage', 'weekend');
-      // }
       this._lazifySelectedPage('_isWeekendPageOpened', 'weekend');
       return;
     }
@@ -334,14 +316,6 @@ Polymer({
       if (_.isEmpty(this._allSitesData) || _.isUndefined(this._allSitesData)) {
         this.set('_isLoading', !0);
       }else {
-        // if (!this._isRoomPageOpened) {
-        //   this.set('_isRoomPageOpened', !0);
-        //   this.async(function() {
-        //     this.set('_selectedPage', 'room');
-        //   }, 1);
-        // }else {
-        //   this.set('_selectedPage', 'room');
-        // }
         this._lazifySelectedPage('_isRoomPageOpened', 'room');
       }
 
@@ -352,14 +326,7 @@ Polymer({
   _backSite: function() {
     this.set('selectedFloor', null);
     this.set('selectedFloorName', null);
-    // if (!this._isFloorPageOpened) {
-    //   this.set('_isFloorPageOpened', !0);
-    //   this.async(function() {
-    //     this.set('_selectedPage', 'floor');
-    //   }, 1);
-    // }else {
-    //   this.set('_selectedPage', 'floor');
-    // }
+
     this._lazifySelectedPage('_isFloorPageOpened', 'floor');
   },
 
@@ -390,13 +357,6 @@ Polymer({
       var _detailAtSelectedRoom = _.isUndefined(this._reservationDetails) || _.isUndefined(this._reservationDetails[_decodedFloor]) ? '' : this._reservationDetails[_decodedFloor][_selectedItem];
       _temp['name'] = _selectedItem;
 
-      // if (!this._isInfoPageOpened) {
-      //   this.set('_isInfoPageOpened', !0);
-      //   this.async(function() {
-      //
-      //   }, 1);
-      // }
-      // this.set('_selectedPage', 'info');
       this._lazifySelectedPage('_isInfoPageOpened', 'info');
 
       this.set('_detailAtSelectedRoom', [_detailAtSelectedRoom]);
@@ -544,10 +504,6 @@ Polymer({
     if (!_dialogAnimationDone) {
       // Disable document scrolling.
       document.body.style.overflow = 'hidden';
-      // this.$.infoOrSchedule.notifyResize();
-      // if (!this._isInfoOrScheduleOpened) {
-      //   this.set('_isInfoOrScheduleOpened', !0);
-      // }
 
       this._lazifyDialog('_isInfoOrScheduleOpened', function() {
         var _dialog = this.$$('#infoOrSchedule');
@@ -556,8 +512,6 @@ Polymer({
           _dialog.open();
         }, 1);
       });
-      // this.debounce('resizeDialog', function() {
-      // }, 1);
     }
   },
 
@@ -585,15 +539,6 @@ Polymer({
     return !_result ? '' : ' fully-occupied';
   },
 
-  // customProperties FTW! Recompute CSS maxHeight for div.dialog-list-container
-  // right after the dialog is opened!
-  _overflowContent: function(ev) {
-    var _target = ev.target;
-    var _dialogMaxHeight = _target.style.maxHeight;
-    var _newMaxHeight = parseInt(_dialogMaxHeight) - 28 - 24 - 20 - 24;
-    this.customStyle['--dialog-list-container-max-height'] = _newMaxHeight + 'px';
-    this.updateStyles();
-  },
   // Change new background image for the page.
   _changeNewBackgroundImage: function() {
     var _backgroundImages = [
@@ -621,10 +566,21 @@ Polymer({
 
   _transitionSpinner: function(_isLoading) {
     var _isOpaque = _isLoading ? 1 : 0;
-    // Transition opacity of paper-spinnner corresponding to _isLoading's state.
-    this.$.loadingSpinner.style.opacity = _isOpaque;
-    // Hide iron-pages when spinner is showing and vice versa.
-    this.$.currentPages.style.opacity = +!_isOpaque;
+    // Lazily load and show spinner.
+    var _loadSpinner = function() {
+      // Transition opacity of paper-spinnner corresponding to _isLoading's state.
+      this.$$('#loadingSpinner').style.opacity = _isOpaque;
+      // Hide iron-pages when spinner is showing and vice versa.
+      this.$.currentPages.style.opacity = +!_isOpaque;
+    };
+    var _thisLoadSpinner = _loadSpinner.bind(this);
+
+    if (!this._isSpinnerOpened) {
+      this.set('_isSpinnerOpened', !0);
+      this.async(_thisLoadSpinner, 1);
+    }else {
+      _thisLoadSpinner();
+    }
   },
 
   // Lazily load and open the selected page.

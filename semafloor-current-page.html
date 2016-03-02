@@ -52,9 +52,11 @@ Example:
       </div>
     </iron-selector>
 
-    <div id="loadingSpinner" class="waiting-page" page='waiting'>
-      <paper-spinner-lite page="waiting" active></paper-spinner-lite>
-    </div>
+    <template is="dom-if" if="[[_isSpinnerOpened]]" restamp="true" strip-whitespace>
+      <div id="loadingSpinner" class="waiting-page">
+        <paper-spinner-lite active="[[_isLoading]]"></paper-spinner-lite>
+      </div>
+    </template>
 
     <iron-pages id="currentPages" selected="[[_selectedPage]]" attr-for-selected="page">
       <template is="dom-if" if="[[_isWeekendPageOpened]]" restamp="true" strip-whitespace>
@@ -123,7 +125,7 @@ Example:
       </template>
     </iron-pages>
 
-    <template is="dom-if" if="[[_isInfoOrScheduleOpened]]" restamp="true" strip-whitesapce>
+    <template is="dom-if" if="[[_isInfoOrScheduleOpened]]" restamp="true" strip-whitespace>
       <paper-dialog id="infoOrSchedule"
         with-backdrop
         auto-fit-on-attach
@@ -170,7 +172,7 @@ Example:
             </template>
           </template>
         </paper-dialog-scrollable>
-        
+
         <span></span>
       </paper-dialog>
     </template>
