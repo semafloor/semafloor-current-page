@@ -589,9 +589,17 @@ Polymer({
       this.set(_isWhichPageOpened, !0);
       // Is this necessary? JIC loading is still running.
       this.async(function() {
+        // Scroll to the top.
+        if (document.body.scrollTop > 0) {
+          window.scrollTo(0, 0);
+        }
         this.set('_selectedPage', _page);
       }, 1);
     }else {
+      // Scroll to the top.
+      if (document.body.scrollTop > 0) {
+        window.scrollTo(0, 0);
+      }
       this.set('_selectedPage', _page);
     }
   },
