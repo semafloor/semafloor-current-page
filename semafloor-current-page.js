@@ -93,7 +93,7 @@ Polymer({
 
     _dialogAnimationDone: {
       type: Boolean,
-      value: true
+      value: !0
     },
     _dialogTitle: String,
     _dialogList: Array,
@@ -272,7 +272,7 @@ Polymer({
     }
 
     var _allSitesData = this._allSitesData;
-    var _isVacantFloor = true;
+    var _isVacantFloor = !0;
     var _allFloors = [];
 
     if (_selectedSite === 'KLB - Tower 2A') {
@@ -378,7 +378,7 @@ Polymer({
 
     var _ff;
     var _fs = this._floorStatus;
-    var _isVacantRoom = true;
+    var _isVacantRoom = !0;
 
     if (_.isObject(_item)) {
       _ff = _.lowerFirst(_item.floor);
@@ -414,7 +414,7 @@ Polymer({
     // X - TODO: Minor change due to different strucutre in global reservations list.
     _ff = _.lowerFirst(_item.floor);
     var _fs = this._floorStatus;
-    var _isVacantRoom = true;
+    var _isVacantRoom = !0;
 
     if (!_.isUndefined(_fs) && !_.isUndefined(_fs[_ff])) {
       _isVacantRoom = _fs[_ff].indexOf(_item.name) < 0;
@@ -444,11 +444,11 @@ Polymer({
         var _icon = _target.getAttribute('icon');
         var _dialogTitle = 'Room Schedule';
         var _dialogList = this._infoAtSelectedRoom;
-        var _isDialogInfo = false;
+        var _isDialogInfo = !1;
 
         if (_icon.indexOf('info') > 0) {
           _dialogTitle = 'Room Information';
-          _isDialogInfo = true;
+          _isDialogInfo = !0;
         }else {
           var _hexTypes = _.padStart(parseInt(_dialogList[0].time, 16).toString(2), 32, 0);
           var _str2arr = _hexTypes.split('').map(Number);
@@ -475,8 +475,8 @@ Polymer({
         this.set('_dialogTitle', _dialogTitle);
         this.set('_dialogList', _dialogList);
 
-        // Set false to _dialogAnimationDone which will trigger _openDialog method.
-        this.set('_dialogAnimationDone', false);
+        // Set !1 to _dialogAnimationDone which will trigger _openDialog method.
+        this.set('_dialogAnimationDone', !1);
         // this.$.infoOrSchedule.open();
       }
     }
@@ -494,8 +494,8 @@ Polymer({
     if (!this._dialogAnimationDone) {
       console.warn('Subsequent dialog is now ready to be opened!');
       // Bring back document scrolling.
-      document.body.style.overflow = '';
-      this.set('_dialogAnimationDone', true);
+      this._manipulateDocumentScrolling();
+      this.set('_dialogAnimationDone', !0);
     }
   },
 
@@ -503,7 +503,7 @@ Polymer({
     // Only when is _dialogAnimationDone falsy dialog is allowed to be opened.
     if (!_dialogAnimationDone) {
       // Disable document scrolling.
-      document.body.style.overflow = 'hidden';
+      this._manipulateDocumentScrolling('hidden');
 
       this._lazifyDialog('_isInfoOrScheduleOpened', function() {
         var _dialog = this.$$('#infoOrSchedule');
@@ -616,7 +616,14 @@ Polymer({
     }
   },
 
+  _manipulateDocumentScrolling: function(_state) {
+    var _overflow = typeof _state == 'object' ? '' : _state || '';
+
+    document.body.style.overflow = _overflow;
+  },
+
   // TODO: Add social:mood to weekend page.
+  // X - TODO: _manipulateDocumentScrolling FTW.
   // X - TODO: Styling in between 360P mobile and 800P desktop.
   // X - TODO: Lazify non-critical elements.
   // X - TODO: New weekend page needs more styling.

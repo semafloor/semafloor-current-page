@@ -27,10 +27,19 @@
 
       app-header {
         color: #009688;
-        background-color: #fff;
+        --app-header-background-front-layer: {
+          background-color: #fff;
+        };
+        --app-header-background-rear-layer: {
+          background-color: #009688;
+        };
+      }
+      app-header.condensed,
+      app-header.condensed .title {
+        color: #fff;
       }
 
-      [title] {
+      .title {
         font-size: 20px;
         font-weight: 400;
         margin-left: 8px;
@@ -42,10 +51,12 @@
       <app-drawer swipe-open></app-drawer>
 
       <app-header-layout>
-        <app-header condenses fixed effects="waterfall">
+        <app-header condenses fixed effects="waterfall fade-background">
           <app-toolbar>
             <paper-icon-button icon="icons:menu" drawer-toggle></paper-icon-button>
-            <span title>Current Reservations</span>
+            <span title hidden></span>
+            <span condensed-title hidden></span>
+            <span class="title">Current Reservations</span>
           </app-toolbar>
         </app-header>
 
@@ -69,6 +80,11 @@
 
     <script>
       var _app = document.querySelector('semafloor-current-page');
+      var _header = document.querySelector('app-header');
+
+      _header.addEventListener('app-header-transform', function(ev) {
+        _header.toggleClass('condensed', ev.detail.progress > 0.5);
+      });
 
       _app.addEventListener('current-page-attached', function() {
         console.log('Total element nodes with Lazy-Loading: ', _app.getElementsByTagName('*').length);

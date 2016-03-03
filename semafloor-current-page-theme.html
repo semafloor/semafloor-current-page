@@ -52,9 +52,13 @@
         left: calc(50% - 22px);
         top: calc(64px + 64px + 16px);
         pointer-events: none;
-        box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        /* @apply(--shadow-elevation-4dp); */
+        box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+                    0 1px 10px 0 rgba(0, 0, 0, 0.12),
+                    0 2px 4px -1px rgba(0, 0, 0, 0.4);
+        /*box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
                     0 3px 14px 2px rgba(0, 0, 0, 0.12),
-                    0 5px 5px -3px rgba(0, 0, 0, 0.4);
+                    0 5px 5px -3px rgba(0, 0, 0, 0.4);*/
 
         opacity: 0;
         transition: opacity ease-in .4s;
@@ -254,13 +258,17 @@
         cursor: auto;
       }
 
-      /* @media for anything in between 360P mobile and 800P dekstop */
-      @media all and (min-width: 367px) {
+      /* @media for anything in between 360P mobile and 600P Nexus 7 */
+      @media all and (min-width: 376px) {
         div.site-selectable {
           width: calc(367px / 3);
           max-width: 128px;
         }
+      }
 
+      /* @media for anything above or equal to Nexus 7 */
+      /*@media all and (min-width: 367px) {*/
+      @media all and (min-width: 600px) {
         div.each-floor {
           min-height: 64px;
         }
