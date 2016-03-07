@@ -8,6 +8,7 @@
     <script src="../../lodash/dist/lodash.min.js" charset="utf-8"></script>
 
     <link rel="import" href="../semafloor-current-page.html">
+    <link rel="import" href="semafloor-main.html">
     <link rel="import" href="../../semafloor-icons/semafloor-icons.html">
 
     <link rel="import" href="../../app-layout/app-layout.html">
@@ -20,12 +21,17 @@
 
     <style is="custom-style">
       body {
+        padding: 0;
         margin: 0;
         font-family: 'Roboto', 'Noto', sans-serif;
         -webkit-font-smoothing: antialiased;
       }
 
-      app-header {
+      semafloor-main {
+        --semafloor-current-page-height: calc(100vh - 113px);
+      }
+
+      /*app-header {
         color: #009688;
         --app-header-background-front-layer: {
           background-color: #fff;
@@ -43,11 +49,11 @@
         font-size: 20px;
         font-weight: 400;
         margin-left: 8px;
-      }
+      }*/
     </style>
   </head>
   <body>
-    <app-drawer-layout force-narrow>
+    <!-- <app-drawer-layout force-narrow>
       <app-drawer swipe-open></app-drawer>
 
       <app-header-layout>
@@ -58,7 +64,7 @@
             <span condensed-title hidden></span>
             <span class="title">Current Reservations</span>
           </app-toolbar>
-        </app-header>
+        </app-header> -->
 
         <!-- 32 nodes clean on CH/ OP before optimization-->
         <!-- 40 nodes clean on FF before optimization -->
@@ -74,26 +80,35 @@
         <!-- 75 nodes element on CH/ OP after optimization -->
         <!-- 75 nodes element on FF after optimization -->
 
-        <semafloor-current-page></semafloor-current-page>
+        <!-- <semafloor-current-page></semafloor-current-page>
       </app-header-layout>
-    </app-drawer-layout>
+    </app-drawer-layout> -->
+
+    <semafloor-main></semafloor-main>
 
     <script>
-      var _app = document.querySelector('semafloor-current-page');
-      var _header = document.querySelector('app-header');
-
-      _header.addEventListener('app-header-transform', function(ev) {
-        _header.toggleClass('condensed', ev.detail.progress > 0.5);
-      });
-
-      _app.addEventListener('current-page-attached', function() {
-        console.log('Total element nodes with Lazy-Loading: ', _app.getElementsByTagName('*').length);
-      });
+      // var _app = document.querySelector('semafloor-current-page');
+      // var _header = document.querySelector('app-header');
+      //
+      // _header.addEventListener('app-header-transform', function(ev) {
+      //   _header.toggleClass('condensed', ev.detail.progress > 0.5);
+      // });
+      //
+      // _app.addEventListener('current-page-attached', function() {
+      //   console.log('Total element nodes with Lazy-Loading: ', _app.getElementsByTagName('*').length);
+      // });
       // HTMLImports.whenReady(function() {
       //   window.setTimeout(function() {
       //     console.log('Total element nodes: ', _app.getElementsByTagName('*').length);
       //   });
       // });
+      var _main = document.querySelector('semafloor-main');
+
+      _main.addEventListener('main-page-attached', function(ev) {
+        var _tel = _main.getElementsByTagName('*').length;
+        console.log('Total element nodes w/ Lazy-Loading:', _tel);
+      });
+
     </script>
 
   </body>

@@ -114,7 +114,6 @@ Polymer({
 
   observers: [
     '_whenSelectedSiteChanged(selectedSite)',
-    '_referenceToUserFirebase(uid)',
     '_computeFloorStatus(_currentReservations, selectedSite)',
     '_openDialog(_dialogAnimationDone)',
     '_isMobilePortraitChanged(_isMobilePortrait)',
