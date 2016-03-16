@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="semafloor-reserve-page-theme.html">
+<link rel="import" href="reserve-list.html">
+
+<link rel="import" href="../iron-pages/iron-pages.html">
+
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+<!--
+An element providing a solution to no problem in particular.
+
+Example:
+
+    <semafloor-reserve-page></semafloor-reserve-page>
+
+@group Seed Elements
+@element semafloor-reserve-page
+@demo demo/index.html
+@hero hero.svg
+-->
+<dom-module id="semafloor-reserve-page">
+  <template strip-whitespace>
+    <style include="semafloor-reserve-page-theme"></style>
+
+    <template is="dom-if" if="[[_isSpinnerOpened]]" restamp="true" strip-whitespace>
+      <paper-spinner-lite class$="[[_computeLoadingCls(_isLoading)]]" active name="waiting"></paper-spinner-lite>
+    </template>
+
+    <iron-pages id="reservePages" class$="[[_computeLoadingCls(_isLoading)]]" selected="{{_page}}" attr-for-selected="name">
+      <reserve-list id="todayList" name="today" count="{{todayCount}}" uid="[[uid]]"></reserve-list>
+      <reserve-list id="thisweekList" name="thisweek" count="{{thisweekCount}}" uid="[[uid]]"></reserve-list>
+      <reserve-list id="upcomingList" name="upcoming" count="{{upcomingCount}}" uid="[[uid]]"></reserve-list>
+    </iron-pages>
+
+  </template>
+</dom-module>
+<script src="semafloor-reserve-page.js"></script>
