@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <!-- Step 1: import the element to test -->
+    <link rel="import" href="../semafloor-current-page.html">
+  </head>
+  <body>
+
+    <!-- You can use the document as a place to set up your fixtures. -->
+
+    <test-fixture id="current">
+      <template strip-whitespace>
+        <semafloor-current-page></semafloor-current-page>
+      </template>
+    </test-fixture>
+
+    <script>
+      var el;
+
+      suite('test for value on first init', function() {
+        setup(function() {
+          el = fixture('current');
+        });
+
+        test('selectedSite should have value on first init', function() {
+          assert.isString(el.selectedSite);
+        });
+
+        test('selectedFloor is undefined on first init', function() {
+          assert.isUndefined(el.selectedFloor);
+        });
+
+        test('selectedFloorName should have value on first init', function() {
+          assert.isUndefined(el.selectedFloorName);
+        });
+
+        test('selectedRoomName should have value on first init', function() {
+          assert.isUndefined(el.selectedRoomName);
+        });
+
+        test('_floorsAtSelectedSite should have array', function() {
+          assert.isArray(el._floorsAtSelectedSite);
+        });
+
+        test('iron selector is set on correct selector', function() {
+          var _selector = el.querySelectorAll('.site-selectable')[0];
+          if (_selector === null) {
+            _selector = Polymer.dom(el.root).querySelectorAll('.site-selectable')[0];
+          }
+
+          flush(function() {
+            assert.isTrue(_selector.classList.contains('iron-selected'));
+          });
+        });
+      });
+    </script>
+
+  </body>
+</html>
