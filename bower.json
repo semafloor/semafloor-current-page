@@ -4,7 +4,7 @@
   "authors": [
     "semafloor <wes_ngrongsen@hotmail.com>"
   ],
-  "description": "Semafloor's Current Reservations Page.",
+  "description": "A sub-element to display all reservations in the next half an hour.",
   "keywords": [
     "polymer",
     "seed",

@@ -10,15 +10,20 @@
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
 
+<link rel="import" href="../neon-animation/animations/slide-down-animation.html">
+<link rel="import" href="../neon-animation/animations/slide-from-bottom-animation.html">
+<link rel="import" href="../neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="../neon-animation/animations/fade-out-animation.html">
+
 <link rel="import" href="../firebase-element/firebase-collection.html">
 <!--
-An element providing a solution to no problem in particular.
+A sub-element to display all reservations in the next half an hour.
 
 Example:
 
     <semafloor-current-page></semafloor-current-page>
 
-@group Seed Elements
+@group Semafloor
 @element semafloor-current-page
 @demo demo/index.html
 @hero hero.svg
@@ -40,7 +45,7 @@ Example:
         position: relative;
       }
 
-      *, *::before, *::after {
+      * {
         box-sizing: border-box;
       }
 
@@ -80,16 +85,16 @@ Example:
         left: calc(50% - 22px);
         top: 16px;
         pointer-events: none;
-        /* @apply(--shadow-elevation-4dp); */
-        box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+         @apply(--shadow-elevation-4dp);
+        /*box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
                     0 1px 10px 0 rgba(0, 0, 0, 0.12),
-                    0 2px 4px -1px rgba(0, 0, 0, 0.4);
+                    0 2px 4px -1px rgba(0, 0, 0, 0.4);*/
         opacity: 1;
         transition: opacity ease-in .4s;
         -webkit-transition: opacity ease-in .4s;
       }
       paper-spinner-lite {
-        --paper-spinner-color: #1ddbd8;
+        --paper-spinner-color: #1ddb8b;
       }
 
       div.weekend-page {
@@ -308,10 +313,10 @@ Example:
           width: 360px;
           margin: 8px auto;
           overflow: auto;
-          /* @apply(--shadow-elevation-4dp); */
-          box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+           @apply(--shadow-elevation-4dp);
+          /*box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
                       0 1px 10px 0 rgba(0, 0, 0, 0.12),
-                      0 2px 4px -1px rgba(0, 0, 0, 0.4);
+                      0 2px 4px -1px rgba(0, 0, 0, 0.4);*/
         }
       }
 
@@ -484,8 +489,7 @@ Example:
         with-backdrop
         auto-fit-on-attach
         no-auto-focus
-        entry-animation="datepicker-slide-from-bottom-animation"
-        exit-animation="datepicker-slide-from-top-animation"
+        animation-config="[[_animationConfig]]"
         on-iron-overlay-closed="_dialogClosedDone">
         <h2>[[_dialogTitle]]</h2>
         <paper-dialog-scrollable>
@@ -547,14 +551,28 @@ Example:
     is: 'semafloor-current-page',
 
     properties: {
+      /**
+       * On first load, a site will selected to display all data inside that selected site.
+       * By default, the first site is always selected in this case.
+       */
       selectedSite: {
         type: String,
         value: 'KLB - Tower 5'
       },
+      /**
+       * This is to display the all data in that selected floor from user's input.
+       */
       selectedFloor: String,
+      /**
+       * This is to show in the selected tab which floor has been selected by the user.
+       */
       selectedFloorName: String,
+      /**
+       * This is used to show in the selected tab which room has been selected by the user.
+       */
       selectedRoomName: String,
 
+      _animationConfig: Object,
       _selectedPage: String,
       _floorsAtSelectedSite: {
         type: Array,
@@ -652,7 +670,6 @@ Example:
       //
       // This is the point where you should make modifications to the DOM (when
       // necessary), or kick off any processes the element wants to perform.
-      // console.timeEnd('semafloor-current-ready');
     },
 
     attached: function() {
@@ -686,7 +703,6 @@ Example:
     },
 
     _onFirebaseValue: function(ev) {
-      console.log('firebase value: ', ev.detail.val());
       var _firebaseData = ev.detail.val();
 
       // Probably today is weekend, yet you're checking for reservations.
@@ -717,8 +733,6 @@ Example:
       // Set _allSitesData first before _currentReservations.
       this.set('_allSitesData', _firebaseData.site);
       this.set('_currentReservations', _.sortBy(_.pickBy(_firebaseData.reservations, function(_value, _key) { return _key.length > 4; }), ['fromTime']));
-
-      console.log('on-firebase-value');
     },
 
     _computeFloorsAtSelection: function(_selectedSite) {
@@ -1027,6 +1041,32 @@ Example:
 
         this._lazifyDialog('_isInfoOrScheduleOpened', function() {
           var _dialog = this.$$('#infoOrSchedule');
+
+          this.set('_animationConfig', {
+            'entry': [{
+              name: 'slide-from-bottom-animation',
+              node: _dialog,
+            }, {
+              name: 'fade-in-animation',
+              node: _dialog,
+              timing: {
+                delay: 250,
+                duration: 250
+              }
+            }],
+            'exit': [{
+              name: 'slide-down-animation',
+              node: _dialog
+            }, {
+              name: 'fade-out-animation',
+              node: _dialog,
+              timing: {
+                delay: 0,
+                duration: 250
+              }
+            }]
+          });
+
           _dialog.notifyResize();
           this.async(function() {
             _dialog.open();

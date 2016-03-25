@@ -3,7 +3,7 @@
 
 # semafloor-current-page
 
-A sub-element to display all reservations at all periods specifically for current ones.
+A sub-element to display all reservations in the next half an hour.
 
 ## License
 
