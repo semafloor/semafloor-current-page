@@ -388,6 +388,118 @@ Example:
           margin-left: 26%;
         }
       }
+
+      /* dark theme */
+      :host(.dark-theme) {
+        color: #bcbcbc;
+      }
+
+      :host(.dark-theme) div.waiting-page,
+      :host(.dark-theme) div.weekend-page,
+      :host(.dark-theme) div.floor-page,
+      :host(.dark-theme) div.room-page,
+      :host(.dark-theme) div.info-page {
+        background-color: #303030;
+      }
+
+      :host(.dark-theme) div.each-floor-status {
+        background-color: #64dd17;
+      }
+      :host(.dark-theme) div.each-floor-status.fully-occupied {
+        background-color: #c51162;
+      }
+      :host(.dark-theme) div.each-floor-status.reserved {
+        background-color: #ffab00;
+      }
+      :host(.dark-theme) div.each-floor {
+        border-bottom: 1px solid #3c3c3c;
+      }
+      :host(.dark-theme) div.site-selectable {
+        background-color: #424242;
+        border: 1px solid #303030;
+        color: #757575;
+      }
+      :host(.dark-theme) div.site-selectable.iron-selected,
+      :host(.dark-theme) div.room-page > .floor-selectable,
+      :host(.dark-theme) div.info-selection > .floor-selectable {
+        border-color: #00695c;
+        background-color: #00695c;
+        color: #f5f5f5;
+      }
+
+      :host(.dark-theme) div.each-floor.each-info-name {
+        background-color: rgba(33, 33, 33, .5);
+        border-top: 1px solid #3c3c3c;
+      }
+      :host(.dark-theme) div.each-info {
+        border-bottom: 1px solid #3c3c3c;
+      }
+      :host(.dark-theme) div.each-info > span {
+        color: #9e9e9e;
+      }
+      :host(.dark-theme) div.info-title {
+        color: #bcbcbc;
+      }
+      :host(.dark-theme) div.each-info-button > iron-icon.icon-info,
+      :host(.dark-theme) div.each-info-button > iron-icon.icon-schedule {
+        color: #3c3c3c;
+      }
+      :host(.dark-theme) iron-icon.info-status {
+        color: #388e3c;
+      }
+      :host(.dark-theme) iron-icon.info-status.fully-occupied {
+        color: #d32f2f;
+      }
+      :host(.dark-theme) iron-icon.info-status.reserved {
+        color: #f57c00;
+      }
+      :host(.dark-theme) div.info-locked {
+        /*color: #ff9800;*/
+      }
+      :host(.dark-theme) iron-icon.info-lock {
+        color: #ff9800;
+      }
+      :host(.dark-theme) iron-icon.info-lock-open {
+        color: #757575;
+      }
+
+      :host(.dark-theme) paper-dialog {
+        background-color: #424242;
+        color: #bcbcbc;
+      }
+      :host(.dark-theme) paper-dialog > h2 {
+        color: #eee;
+      }
+      :host(.dark-theme) div.each-dialog-list > span,
+      :host(.dark-theme) div.each-dialog-list > paper-checkbox {
+        color: #9e9e9e;
+      }
+      :host(.dark-theme) div.each-dialog-list > paper-checkbox {
+        --paper-checkbox-label-color: #9e9e9e;
+
+        --paper-checkbox-checkmark-color: #303030;
+        --paper-checkbox-checked-color: #80cbc4;
+        --paper-checkbox-checked-ink-color: #80cbc4;
+        --paper-checkbox-unchecked-color: #bcbcbc;
+        --paper-checkbox-unchecked-ink-color: #bcbcbc;
+      }
+      :host(.dark-theme) div.each-dialog-time {
+        border-top: 1px solid #646464;
+        border-left: 1px solid #646464;
+        border-right: 1px solid #646464;
+        color: #9e9e9e;
+      }
+      :host(.dark-theme) div.each-dialog-time:last-of-type {
+        border-bottom: 1px solid #646464;
+      }
+      :host(.dark-theme) div.each-dialog-time > span {
+        border-left: 1px solid #646464;
+        background-color: #00c853;
+      }
+      :host(.dark-theme) div.each-dialog-time > span.fully-occupied {
+        background-color: #d50000;
+      }
+
     </style>
 
     <iron-media-query query="min-width: 801px" query-matches="{{_veryLargeDesktop}}"></iron-media-query>
@@ -553,6 +665,11 @@ Example:
 
     properties: {
       /**
+       * To set new theme for the page. Default theme is light theme.
+       * The value can be changed via `Settings` page.
+       */
+      themeSelected: String,
+      /**
        * On first load, a site will selected to display all data inside that selected site.
        * By default, the first site is always selected in this case.
        */
@@ -656,7 +773,8 @@ Example:
       '_whenSelectedSiteChanged(selectedSite)',
       '_computeFloorStatus(_currentReservations, selectedSite)',
       '_openDialog(_dialogAnimationDone)',
-      '_transitionSpinner(_isLoading)'
+      '_transitionSpinner(_isLoading)',
+      '_updateThemeColor(themeSelected)',
     ],
 
     // Element Lifecycle
@@ -1180,6 +1298,12 @@ Example:
       var _overflow = typeof _state == 'object' ? '' : _state || '';
 
       document.body.style.overflow = _overflow;
+    },
+
+    _updateThemeColor: function(_themeSelected) {
+      var _isDarkTheme = _themeSelected === 'dark theme';
+      this.toggleClass('dark-theme', _isDarkTheme, this);
+      this.updateStyles();
     },
 
     // TODO: Add social:mood to weekend page.
