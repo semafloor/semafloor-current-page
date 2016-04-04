@@ -727,12 +727,9 @@ Example:
           var _year = _today.getFullYear();
           var _month = _.padStart(_today.getMonth(), 2, '0') + _getMonthName(_today.getMonth());
           var _week = 'week' + _.padStart(_getWeek(_today), 2, '0');
-          // var _date = _.padStart(_today.getDate(), 2, '0');
-          var _date = _.padStart(4, 2, '0');
+          var _date = _.padStart(_today.getDate(), 2, '0');
 
           return [_baseRef, _year, _month, _week, _date].join('/');
-          // TODO: For development purpose...
-          // return [_baseRef, _year, _month, 'week07', 17].join('/');
         }
       },
       _floorStatus: Object,
