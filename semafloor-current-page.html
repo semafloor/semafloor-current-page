@@ -727,7 +727,8 @@ Example:
           var _year = _today.getFullYear();
           var _month = _.padStart(_today.getMonth(), 2, '0') + _getMonthName(_today.getMonth());
           var _week = 'week' + _.padStart(_getWeek(_today), 2, '0');
-          var _date = _.padStart(_today.getDate(), 2, '0');
+          // var _date = _.padStart(_today.getDate(), 2, '0');
+          var _date = _.padStart(4, 2, '0');
 
           return [_baseRef, _year, _month, _week, _date].join('/');
           // TODO: For development purpose...
@@ -771,7 +772,7 @@ Example:
 
     observers: [
       '_whenSelectedSiteChanged(selectedSite)',
-      '_computeFloorStatus(_currentReservations, selectedSite)',
+      '_computeFloorStatus(_currentReservations.*, selectedSite)',
       '_openDialog(_dialogAnimationDone)',
       '_transitionSpinner(_isLoading)',
       '_updateThemeColor(themeSelected)',
@@ -850,6 +851,7 @@ Example:
       // TODO: What if today happens to be one of the weekends?
       // Set _allSitesData first before _currentReservations.
       this.set('_allSitesData', _firebaseData.site);
+      // TODO: reservations have been updated to the latest format so still contains time, _key.length > 4 is to get pushed in data.
       this.set('_currentReservations', _.sortBy(_.pickBy(_firebaseData.reservations, function(_value, _key) { return _key.length > 4; }), ['fromTime']));
     },
 
@@ -890,11 +892,29 @@ Example:
       var _backwardTimeString = _.padStart(Math.floor(_backwardTimeInHours / 2), 2, '0') + ':' + _.padStart(_backwardTimeInHours / 2 % 1 * 60, 2, '0');
       var _forwardTimeString = _.padStart(Math.floor(_forwardTimeInHours / 2), 2, '0') + ':' + _.padStart(_forwardTimeInHours / 2 % 1 * 60, 2, '0');
 
+      // Only run the codes when it's in between 08:00 and 23:30.
+      // if (_backwardTimeString < '08:00' || _forwardTimeString > '23:00') {
+      //   this.set('_floorStatus', {});
+      //   this.set('_reservationDetails', {});
+      //   return;
+      // }
+
+      // reserved time - 08:15 - 08:45 ---> 08:00 - 09:00
+      // current time  - 08:25 - xx:xx ---> 08:00 - 08:30
+      // hence, result - xxxxxxxxxxxxx ---> currentTime.fromTime >= reservedTime.fromTime && currentTime.toTime <= reservedTime.toTime
+      // It's an occupied room!
+      //
+      // reserved time - 09:15 - 09:25 ---> 09:00 - 09:30
+      // current time  - 08:25 - xx:xx ---> 08:00 - 08:30
+      // hence, result - xxxxxxxxxxxxx ---> currentTime.fromTime >= reservedTime.fromTime && currentTime.toTime <= reservedTime.toTime
+      // It's an empty room!
       var _extractedReservationsTemp = {};
       var _reservationDetailsTemp = {};
-      _.forEach(_currentReservations, function(n) {
+      _.forEach(_currentReservations.base, function(n) {
         if (n.roomInfo.site === _selectedSite) {
-          if (n.fromTime >= _backwardTimeString && n.fromTime <= _forwardTimeString) {
+          // if (n.fromTime >= _backwardTimeString && n.fromTime <= _forwardTimeString) {
+          // if ('08:00' >= n.fromTime && '08:30' <= n.toTime) {
+          if (_backwardTimeString >= n.fromTime && _forwardTimeString <= n.toTime) {
             // X - TODO: To filter reservations at current time period.
             var _lowerFirstLevel = _.lowerFirst(n.roomInfo.floor);
             var _convertedFloorIdx = _alphaFloors.indexOf(_lowerFirstLevel);
